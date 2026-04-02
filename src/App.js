@@ -90,7 +90,7 @@ function productStatusStyle(status) {
 const S = {
   app: { fontFamily:'"Inter","Noto Sans TC",-apple-system,BlinkMacSystemFont,sans-serif', color:C.text, background:C.bg, minHeight:'100vh' },
   // Nav
-  nav: { background:'#fff', borderBottom:'none', boxShadow:'0 1px 3px rgba(0,0,0,.10)', padding:'10px 32px', display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky', top:0, zIndex:100 },
+  nav: { background:'#fff', borderBottom:'none', boxShadow:'0 1px 3px rgba(0,0,0,.10)', padding:'14px 32px', display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky', top:0, zIndex:100 },
   navBrand: { display:'flex', alignItems:'center', gap:12, cursor:'pointer', userSelect:'none', textDecoration:'none' },
   navLogoMark: { width:42, height:42, background:'#1a3a5c', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 },
   navLogoText: { color:'#fff', fontSize:14, fontWeight:700, letterSpacing:'1px' },
@@ -763,7 +763,7 @@ export default function App() {
       {/* ── AMC Brand ── */}
       <div style={S.navBrand} onClick={goShop} role="button" tabIndex={0} title="回首頁"
         onKeyDown={e => e.key === 'Enter' && goShop()}>
-        <img src="/logo.png" alt="AMC 宏睿樂器" style={{height:'48px',objectFit:'contain'}} />
+        <img src="/logo.png" alt="AMC 宏睿樂器" style={{height:'80px',objectFit:'contain'}} />
       </div>
 
       {/* ── Right nav ── */}
