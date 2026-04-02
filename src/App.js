@@ -10,38 +10,38 @@ const headers = {
   'Prefer': 'return=representation'
 };
 
-const CATEGORIES = ['å¨é¨','åä»/è²æ¯','ææå¨/é³ç®±','é¼/ææ','å¼¦','èå¸¶','Pick/æ¥ç','ç´è¢/ç´ç','èª¿é³å¨/ç¯æå¨','ç´æ¶/æ¯æ¶','ä¿é¤/å·¥å·','ç·æ/éä»¶','ç®¡æ¨å¨','éµç¤/åæå¨','PA/éé³è¨­å','å¶ä»'];
-const PROD_CATS  = ['åä»/è²æ¯','ææå¨/é³ç®±','é¼/ææ','å¼¦','èå¸¶','Pick/æ¥ç','ç´è¢/ç´ç','èª¿é³å¨/ç¯æå¨','ç´æ¶/æ¯æ¶','ä¿é¤/å·¥å·','ç·æ/éä»¶','ç®¡æ¨å¨','éµç¤/åæå¨','PA/éé³è¨­å','å¶ä»'];
-const ORDER_STATUSES = ['å¾ç¢ºèª','å·²ç¢ºèª','å·²å®æ','å·²åæ¶'];
+const CATEGORIES = ['全部','吉他/貝斯','效果器/音箱','鼓/打擊','弦','背帶','Pick/撥片','琴袋/琴盒','調音器/節拍器','琴架/支架','保養/工具','線材/配件','管樂器','鍵盤/合成器','PA/錄音設備','其他'];
+const PROD_CATS  = ['吉他/貝斯','效果器/音箱','鼓/打擊','弦','背帶','Pick/撥片','琴袋/琴盒','調音器/節拍器','琴架/支架','保養/工具','線材/配件','管樂器','鍵盤/合成器','PA/錄音設備','其他'];
+const ORDER_STATUSES = ['待確認','已確認','已完成','已取消'];
 
 const DEFAULT_BANNERS = [
   {
     id:'b1',
     image_url:'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=1600&q=80',
     title:'Your Sound,\nYour Stage.',
-    subtitle:'åä»ãè²æ¯ãéµç¤ãé¼çµååå¼éä»¶ï¼ä¸ç«è³¼è¶³',
-    cta_label:'ç«å³é¸è³¼',
+    subtitle:'吉他、貝斯、鍵盤、鼓組及各式配件，一站購足',
+    cta_label:'立即選購',
     cta_category:'',
   },
   {
     id:'b2',
     image_url:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=80',
     title:'Craft Your\nPerfect Tone.',
-    subtitle:'ç²¾é¸ææå¨ãé³ç®±ååå¼å¨ééä»¶',
-    cta_label:'ææå¨å°å',
-    cta_category:'ææå¨',
+    subtitle:'精選效果器、音箱及各式周邊配件',
+    cta_label:'效果器專區',
+    cta_category:'效果器',
   },
   {
     id:'b3',
     image_url:'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=1600&q=80',
     title:'Feel Every\nNote.',
-    subtitle:'éµç¤ãé¼ç´ç³»åç²¾é¸åå',
-    cta_label:'éµç¤å°å',
-    cta_category:'éµç¤/é¼ç´',
+    subtitle:'鍵盤、鋼琴系列精選商品',
+    cta_label:'鍵盤專區',
+    cta_category:'鍵盤/鋼琴',
   },
 ];
 
-// âââ Helpers âââ
+// ─── Helpers ───
 function generateOrderNumber() {
   const d = new Date();
   const y = d.getFullYear();
@@ -52,7 +52,7 @@ function generateOrderNumber() {
 }
 
 function formatDate(iso) {
-  if (!iso) return 'â';
+  if (!iso) return '—';
   const d = new Date(iso);
   return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
@@ -68,7 +68,7 @@ async function apiFetch(path, opts = {}) {
   return res.json();
 }
 
-// âââ Colors âââ
+// ─── Colors ───
 const C = {
   primary: '#111111', primaryHover: '#333333',
   danger: '#dc2626', bg: '#ffffff', card: '#ffffff',
@@ -76,17 +76,17 @@ const C = {
   success: '#16a34a', warning: '#d97706'
 };
 
-// âââ Status badge helpers âââ
+// ─── Status badge helpers ───
 function orderStatusStyle(status) {
-  const clr = { 'å¾ç¢ºèª':'#f97316','å·²ç¢ºèª':'#3b82f6','å·²å®æ':'#16a34a','å·²åæ¶':'#ef4444' }[status] || '#94a3b8';
+  const clr = { '待確認':'#f97316','已確認':'#3b82f6','已完成':'#16a34a','已取消':'#ef4444' }[status] || '#94a3b8';
   return { display:'inline-block', padding:'2px 10px', borderRadius:20, fontSize:12, fontWeight:600, background: clr+'22', color: clr };
 }
 function productStatusStyle(status) {
-  if (status === 'ä¸æ¶ä¸­') return { display:'inline-block', padding:'2px 10px', borderRadius:20, fontSize:12, fontWeight:600, background:'#16a34a22', color:'#16a34a' };
+  if (status === '上架中') return { display:'inline-block', padding:'2px 10px', borderRadius:20, fontSize:12, fontWeight:600, background:'#16a34a22', color:'#16a34a' };
   return { display:'inline-block', padding:'2px 10px', borderRadius:20, fontSize:12, fontWeight:600, background:'#94a3b822', color:'#94a3b8' };
 }
 
-// âââ Styles âââ
+// ─── Styles ───
 const S = {
   app: { fontFamily:'"Inter","Noto Sans TC",-apple-system,BlinkMacSystemFont,sans-serif', color:C.text, background:C.bg, minHeight:'100vh' },
   // Nav
@@ -185,7 +185,7 @@ const S = {
   retryBtn: { padding:'10px 24px', background:C.text, color:'#fff', border:'none', borderRadius:0, cursor:'pointer', fontWeight:600, marginTop:12 },
   empty: { textAlign:'center', padding:60, color:C.textLight, fontSize:15 },
 
-  // ââ Admin ââ
+  // ── Admin ──
   adminLayout: { display:'flex', minHeight:'100vh' },
   adminSidebar: { width:220, background:'#1e293b', color:'#fff', display:'flex', flexDirection:'column', position:'fixed', top:0, left:0, bottom:0, zIndex:50, overflowY:'auto' },
   adminSidebarHeader: { padding:'20px 20px 16px', borderBottom:'1px solid rgba(255,255,255,.1)' },
@@ -215,7 +215,7 @@ const S = {
   addProductBtn: { padding:'8px 16px', background:C.primary, color:'#fff', border:'none', borderRadius:8, cursor:'pointer', fontWeight:600, fontSize:14, display:'flex', alignItems:'center', gap:6 },
   dangerIconBtn: { padding:'5px 10px', background:'none', border:`1px solid ${C.danger}`, color:C.danger, borderRadius:6, cursor:'pointer', fontSize:12, display:'inline-flex', alignItems:'center', gap:4 },
 
-  // ââ Product Detail ââ
+  // ── Product Detail ──
   detailContainer: { maxWidth:1280, margin:'0 auto', padding:'24px 24px' },
   detailBack: { display:'inline-flex', alignItems:'center', gap:4, color:C.textLight, background:'none', border:'none', cursor:'pointer', fontSize:13, fontWeight:500, marginBottom:24, padding:0, letterSpacing:'0.02em' },
   detailLayout: { display:'grid', gridTemplateColumns:'1fr 1fr', gap:48, marginBottom:40 },
@@ -247,7 +247,7 @@ const S = {
   recName: { fontSize:13, fontWeight:600, marginBottom:2, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' },
   recBrand: { fontSize:11, color:C.textLight, marginBottom:4, textTransform:'uppercase', letterSpacing:'0.05em' },
   recPrice: { fontSize:13, fontWeight:700, color:C.text },
-  // ââ Banner carousel ââ
+  // ── Banner carousel ──
   bannerWrap: { position:'relative', overflow:'hidden', minHeight:420, background:'#111', userSelect:'none' },
   bannerSlide: { position:'absolute', inset:0, transition:'opacity .9s ease', display:'flex', alignItems:'center' },
   bannerBg: { position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', objectPosition:'center', display:'block' },
@@ -258,7 +258,7 @@ const S = {
   bannerDots: { position:'absolute', bottom:18, left:'50%', transform:'translateX(-50%)', display:'flex', gap:8, zIndex:10 },
   bannerDot: { width:7, height:7, borderRadius:'50%', background:'rgba(255,255,255,.35)', border:'none', cursor:'pointer', padding:0, transition:'all .3s', flexShrink:0 },
   bannerDotActive: { width:22, height:7, borderRadius:4, background:'#fff', border:'none', cursor:'pointer', padding:0, transition:'all .3s', flexShrink:0 },
-  // ââ Shop sidebar ââ
+  // ── Shop sidebar ──
   shopWrapper: { display:'flex', borderTop:`1px solid ${C.border}` },
   shopSidebar: { width:200, flexShrink:0, background:'#fff', borderRight:`1px solid ${C.border}`, position:'sticky', top:57, height:'calc(100vh - 57px)', overflowY:'auto' },
   shopSidebarLogo: { display:'flex', alignItems:'center', gap:8, padding:'18px 20px 14px', borderBottom:`1px solid ${C.border}`, cursor:'pointer', background:'none', border:'none', width:'100%', textAlign:'left' },
@@ -310,16 +310,16 @@ styleTag.textContent = `
 `;
 if (!document.querySelector('[data-app-styles]')) { styleTag.setAttribute('data-app-styles',''); document.head.appendChild(styleTag); }
 
-// âââ App âââ
+// ─── App ───
 export default function App() {
-  // ââ Frontend state ââ
+  // ── Frontend state ──
   const [page, setPage] = useState('shop'); // shop | confirm | orders | admin
   const [products, setProducts] = useState([]);
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [categoryFilter, setCategoryFilter] = useState('å¨é¨');
-  const [brandFilter, setBrandFilter] = useState('å¨é¨');
+  const [categoryFilter, setCategoryFilter] = useState('全部');
+  const [brandFilter, setBrandFilter] = useState('全部');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState('default');
   const [cart, setCart] = useState([]);
@@ -334,19 +334,19 @@ export default function App() {
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [quantities, setQuantities] = useState({});
 
-  // ââ Detail page state ââ
+  // ── Detail page state ──
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [detailQty, setDetailQty] = useState(1);
   const [detailAddedMsg, setDetailAddedMsg] = useState(false);
 
-  // ââ Admin state ââ
+  // ── Admin state ──
   const [adminPage, setAdminPage] = useState('dashboard');
   const [adminProducts, setAdminProducts] = useState([]);
   const [adminOrders, setAdminOrders] = useState([]);
   const [adminBrands, setAdminBrands] = useState([]);
   const [adminLoading, setAdminLoading] = useState(false);
   const [productModal, setProductModal] = useState(null); // null | 'new' | {product}
-  const [productForm, setProductForm] = useState({ name:'', brand_id:'', sku:'', price:0, category:'åä»å¼¦', status:'ä¸æ¶ä¸­', image_url:'', description:'' });
+  const [productForm, setProductForm] = useState({ name:'', brand_id:'', sku:'', price:0, category:'吉他弦', status:'上架中', image_url:'', description:'' });
   const [productFormErrors, setProductFormErrors] = useState({});
   const [savingProduct, setSavingProduct] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -354,33 +354,33 @@ export default function App() {
   const [newBrandName, setNewBrandName] = useState('');
   const [addingBrand, setAddingBrand] = useState(false);
   const [productSearch, setProductSearch] = useState('');
-  const [productStatusFilter, setProductStatusFilter] = useState('å¨é¨');
+  const [productStatusFilter, setProductStatusFilter] = useState('全部');
   const [orderSearch, setOrderSearch] = useState('');
-  const [orderStatusFilter, setOrderStatusFilter] = useState('å¨é¨');
+  const [orderStatusFilter, setOrderStatusFilter] = useState('全部');
   const [expandedAdminOrder, setExpandedAdminOrder] = useState(null);
   const [orderDeleteConfirm, setOrderDeleteConfirm] = useState(null); // null | order object
   const [deletingOrder, setDeletingOrder] = useState(false);
   const [orderEditModal, setOrderEditModal] = useState(null); // null | order object
-  const [orderEditForm, setOrderEditForm] = useState({ customer_name:'', contact:'', notes:'', status:'å¾ç¢ºèª' });
+  const [orderEditForm, setOrderEditForm] = useState({ customer_name:'', contact:'', notes:'', status:'待確認' });
   const [orderEditItems, setOrderEditItems] = useState([]); // [{...item, _deleted:false, _qty:n}]
   const [savingOrder, setSavingOrder] = useState(false);
   const [orderSaveError, setOrderSaveError] = useState('');
 
-  // ââ My orders identity ââ
+  // ── My orders identity ──
   const [myContact, setMyContact] = useState(() => localStorage.getItem('myContact') || '');
   const [contactLookup, setContactLookup] = useState('');
 
-  // ââ Admin auth state ââ
+  // ── Admin auth state ──
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(() => sessionStorage.getItem('adminLoggedIn') === 'true');
   const [adminLoginModal, setAdminLoginModal] = useState(false);
   const [adminPasswordInput, setAdminPasswordInput] = useState('');
   const [adminPasswordError, setAdminPasswordError] = useState(false);
 
-  // ââ Image upload state ââ
+  // ── Image upload state ──
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState('');
 
-  // ââ Banner carousel state ââ
+  // ── Banner carousel state ──
   const [bannerSlides, setBannerSlides] = useState(() => {
     try { return JSON.parse(localStorage.getItem('bannerSlides') || 'null') || DEFAULT_BANNERS; }
     catch { return DEFAULT_BANNERS; }
@@ -392,12 +392,12 @@ export default function App() {
   const [bannerUploadErr, setBannerUploadErr] = useState('');
   const [uploadingBanner, setUploadingBanner] = useState(false);
 
-  // ââ Frontend data loading ââ
+  // ── Frontend data loading ──
   const loadData = useCallback(async () => {
     setLoading(true); setError(null);
     try {
       const [prods, brs] = await Promise.all([
-        apiFetch('/rest/v1/products?select=*,brands(name)&status=eq.ä¸æ¶ä¸­'),
+        apiFetch('/rest/v1/products?select=*,brands(name)&status=eq.上架中'),
         apiFetch('/rest/v1/brands?select=id,name')
       ]);
       setProducts(prods); setBrands(brs);
@@ -420,7 +420,7 @@ export default function App() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  // ââ Banner auto-advance ââ
+  // ── Banner auto-advance ──
   useEffect(() => {
     if (bannerSlides.length <= 1 || bannerPaused) return;
     const t = setInterval(() => setBannerIdx(i => (i + 1) % bannerSlides.length), 5000);
@@ -435,7 +435,7 @@ export default function App() {
     localStorage.setItem('bannerSlides', JSON.stringify(bannerSlides));
   }, [bannerSlides]);
 
-  // ââ Admin data loading ââ
+  // ── Admin data loading ──
   const loadAdminProducts = useCallback(async () => {
     try {
       const [prods, brs] = await Promise.all([
@@ -443,14 +443,14 @@ export default function App() {
         apiFetch('/rest/v1/brands?select=id,name&order=name.asc')
       ]);
       setAdminProducts(prods); setAdminBrands(brs);
-    } catch (e) { alert('è¼å¥ååå¤±æï¼' + e.message); }
+    } catch (e) { alert('載入商品失敗：' + e.message); }
   }, []);
 
   const loadAdminOrders = useCallback(async () => {
     try {
       const data = await apiFetch('/rest/v1/orders?select=*,order_items(*)&order=created_at.desc');
       setAdminOrders(data);
-    } catch (e) { alert('è¼å¥è¨å®å¤±æï¼' + e.message); }
+    } catch (e) { alert('載入訂單失敗：' + e.message); }
   }, []);
 
   const loadAdminData = useCallback(async () => {
@@ -463,11 +463,11 @@ export default function App() {
     if (page === 'admin') loadAdminData();
   }, [page, loadAdminData]);
 
-  // ââ Frontend: filtered + sorted products ââ
+  // ── Frontend: filtered + sorted products ──
   const filtered = (() => {
     const base = products.filter(p => {
-      if (categoryFilter !== 'å¨é¨' && p.category !== categoryFilter) return false;
-      if (brandFilter !== 'å¨é¨' && String(p.brand_id) !== brandFilter) return false;
+      if (categoryFilter !== '全部' && p.category !== categoryFilter) return false;
+      if (brandFilter !== '全部' && String(p.brand_id) !== brandFilter) return false;
       if (searchQuery.trim()) {
         const q = searchQuery.trim().toLowerCase();
         const brandName = (brands.find(b => b.id === p.brand_id)?.name || '').toLowerCase();
@@ -481,7 +481,7 @@ export default function App() {
     if (sortOrder === 'newest')     return [...base].sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
     return base;
   })();
-  const hasActiveFilter = categoryFilter !== 'å¨é¨' || brandFilter !== 'å¨é¨';
+  const hasActiveFilter = categoryFilter !== '全部' || brandFilter !== '全部';
 
   const cartCount = cart.reduce((s,c) => s + c.quantity, 0);
   const cartTotal = cart.reduce((s,c) => s + c.quantity * c.price, 0);
@@ -516,16 +516,16 @@ export default function App() {
   function goShop() {
     setPage('shop');
     setSelectedProductId(null);
-    setCategoryFilter('å¨é¨');
-    setBrandFilter('å¨é¨');
+    setCategoryFilter('全部');
+    setBrandFilter('全部');
     setSearchQuery('');
     window.scrollTo({ top:0, behavior:'smooth' });
   }
 
   async function handleSubmitOrder() {
     const errors = {};
-    if (!formData.name.trim()) errors.name = 'è«è¼¸å¥å§å';
-    if (!formData.contact.trim()) errors.contact = 'è«è¼¸å¥è¯çµ¡æ¹å¼';
+    if (!formData.name.trim()) errors.name = '請輸入姓名';
+    if (!formData.contact.trim()) errors.contact = '請輸入聯絡方式';
     setFormErrors(errors);
     if (Object.keys(errors).length > 0) return;
     setSubmitting(true);
@@ -541,7 +541,7 @@ export default function App() {
       setCart([]); setModalOpen(false); setCartOpen(false);
       setFormData({ name:'', contact:'', notes:'' }); setFormErrors({});
       setPage('confirm');
-    } catch (e) { alert('è¨å®éåºå¤±æï¼' + e.message + '\nè³¼ç©è»å§å®¹å·²ä¿çï¼è«åè©¦ä¸æ¬¡ã'); }
+    } catch (e) { alert('訂單送出失敗：' + e.message + '\n購物車內容已保留，請再試一次。'); }
     finally { setSubmitting(false); }
   }
 
@@ -554,11 +554,11 @@ export default function App() {
       const data = await apiFetch(`/rest/v1/orders?select=*,order_items(*)&contact=eq.${encoded}&order=created_at.desc`);
       setOrders(data);
     }
-    catch (e) { alert('è¼å¥è¨å®å¤±æï¼' + e.message); }
+    catch (e) { alert('載入訂單失敗：' + e.message); }
     finally { setOrdersLoading(false); }
   }
 
-  // ââ Admin: auth ââ
+  // ── Admin: auth ──
   function handleAdminLogin() {
     if (adminPasswordInput === ADMIN_PASSWORD) {
       setIsAdminLoggedIn(true);
@@ -579,15 +579,15 @@ export default function App() {
     goShop();
   }
 
-  // ââ Admin: CRUD ââ
+  // ── Admin: CRUD ──
   function openNewProduct() {
-    setProductForm({ name:'', brand_id:'', sku:'', price:0, category:'åä»å¼¦', status:'ä¸æ¶ä¸­', image_url:'', description:'' });
+    setProductForm({ name:'', brand_id:'', sku:'', price:0, category:'吉他弦', status:'上架中', image_url:'', description:'' });
     setProductFormErrors({});
     setUploadError('');
     setProductModal('new');
   }
   function openEditProduct(p) {
-    setProductForm({ name:p.name||'', brand_id:String(p.brand_id||''), sku:p.sku||'', price:p.price||0, category:p.category||'åä»å¼¦', status:p.status||'ä¸æ¶ä¸­', image_url:p.image_url||'', description:p.description||'' });
+    setProductForm({ name:p.name||'', brand_id:String(p.brand_id||''), sku:p.sku||'', price:p.price||0, category:p.category||'吉他弦', status:p.status||'上架中', image_url:p.image_url||'', description:p.description||'' });
     setProductFormErrors({});
     setUploadError('');
     setProductModal(p);
@@ -595,7 +595,7 @@ export default function App() {
 
   async function handleSaveProduct() {
     const errors = {};
-    if (!productForm.name.trim()) errors.name = 'åååç¨±çºå¿å¡«';
+    if (!productForm.name.trim()) errors.name = '商品名稱為必填';
     setProductFormErrors(errors);
     if (Object.keys(errors).length > 0) return;
     setSavingProduct(true);
@@ -609,7 +609,7 @@ export default function App() {
       setProductModal(null);
       await loadAdminProducts();
       loadData();
-    } catch (e) { alert('å²å­å¤±æï¼' + e.message); }
+    } catch (e) { alert('儲存失敗：' + e.message); }
     finally { setSavingProduct(false); }
   }
 
@@ -619,23 +619,23 @@ export default function App() {
       setDeleteConfirm(null);
       await loadAdminProducts();
       loadData();
-    } catch (e) { alert('åªé¤å¤±æï¼' + e.message); }
+    } catch (e) { alert('刪除失敗：' + e.message); }
   }
 
   async function handleToggleStatus(product) {
-    const newStatus = product.status === 'ä¸æ¶ä¸­' ? 'å·²ä¸æ¶' : 'ä¸æ¶ä¸­';
+    const newStatus = product.status === '上架中' ? '已下架' : '上架中';
     try {
       await apiFetch(`/rest/v1/products?id=eq.${product.id}`, { method:'PATCH', body:JSON.stringify({ status:newStatus }) });
       await loadAdminProducts();
       loadData();
-    } catch (e) { alert('æ´æ°å¤±æï¼' + e.message); }
+    } catch (e) { alert('更新失敗：' + e.message); }
   }
 
   async function handleUpdateOrderStatus(id, status) {
     try {
       await apiFetch(`/rest/v1/orders?id=eq.${id}`, { method:'PATCH', body:JSON.stringify({ status }) });
       await loadAdminOrders();
-    } catch (e) { alert('æ´æ°å¤±æï¼' + e.message); }
+    } catch (e) { alert('更新失敗：' + e.message); }
   }
 
   async function handleDeleteOrder() {
@@ -647,14 +647,14 @@ export default function App() {
       setOrderDeleteConfirm(null);
       await loadAdminOrders();
     } catch (e) {
-      alert('åªé¤å¤±æï¼' + e.message);
+      alert('刪除失敗：' + e.message);
     } finally {
       setDeletingOrder(false);
     }
   }
 
   function openEditOrder(order) {
-    setOrderEditForm({ customer_name: order.customer_name || '', contact: order.contact || '', notes: order.notes || '', status: order.status || 'å¾ç¢ºèª' });
+    setOrderEditForm({ customer_name: order.customer_name || '', contact: order.contact || '', notes: order.notes || '', status: order.status || '待確認' });
     setOrderEditItems((order.order_items || []).map(item => ({ ...item, _qty: item.quantity, _deleted: false })));
     setOrderSaveError('');
     setOrderEditModal(order);
@@ -686,7 +686,7 @@ export default function App() {
       setOrderEditModal(null);
       await loadAdminOrders();
     } catch (e) {
-      setOrderSaveError('å²å­å¤±æï¼' + e.message);
+      setOrderSaveError('儲存失敗：' + e.message);
     } finally {
       setSavingOrder(false);
     }
@@ -701,14 +701,14 @@ export default function App() {
       setBrands(prev => [...prev, brand].sort((a,b) => a.name.localeCompare(b.name)));
       setProductForm(f => ({ ...f, brand_id: String(brand.id) }));
       setBrandModal(false); setNewBrandName('');
-    } catch (e) { alert('æ°å¢åçå¤±æï¼' + e.message); }
+    } catch (e) { alert('新增品牌失敗：' + e.message); }
     finally { setAddingBrand(false); }
   }
 
-  // ââ Image upload ââ
+  // ── Image upload ──
   async function uploadImage(file) {
     if (file.size > 5 * 1024 * 1024) {
-      setUploadError('æªæ¡å¤§å°ä¸å¾è¶é 5MB');
+      setUploadError('檔案大小不得超過 5MB');
       return;
     }
     setUploadingImage(true);
@@ -727,58 +727,50 @@ export default function App() {
         }
       );
       if (!res.ok) {
-        let msg = 'ä¸å³å¤±æ';
+        let msg = '上傳失敗';
         try { const e = await res.json(); msg = e.message || e.error || msg; } catch {}
         throw new Error(msg);
       }
       const url = `${SUPABASE_URL}/storage/v1/object/public/product-images/${fileName}`;
       setProductForm(f => ({ ...f, image_url: url }));
     } catch (e) {
-      setUploadError('åçä¸å³å¤±æï¼' + e.message);
+      setUploadError('圖片上傳失敗：' + e.message);
     } finally {
       setUploadingImage(false);
     }
   }
 
-  // ââ Admin: filtered data ââ
+  // ── Admin: filtered data ──
   const filteredAdminProducts = adminProducts.filter(p => {
-    if (productStatusFilter !== 'å¨é¨' && p.status !== productStatusFilter) return false;
+    if (productStatusFilter !== '全部' && p.status !== productStatusFilter) return false;
     if (productSearch && !p.name.toLowerCase().includes(productSearch.toLowerCase())) return false;
     return true;
   });
   const filteredAdminOrders = adminOrders.filter(o => {
-    if (orderStatusFilter !== 'å¨é¨' && (o.status||'å¾ç¢ºèª') !== orderStatusFilter) return false;
+    if (orderStatusFilter !== '全部' && (o.status||'待確認') !== orderStatusFilter) return false;
     if (orderSearch && !o.order_number?.includes(orderSearch) && !o.customer_name?.includes(orderSearch)) return false;
     return true;
   });
   const totalRevenue = adminOrders.reduce((s,o) => s + (o.total_amount||0), 0);
-  const statusDist = ORDER_STATUSES.reduce((acc,s) => { acc[s] = adminOrders.filter(o => (o.status||'å¾ç¢ºèª') === s).length; return acc; }, {});
+  const statusDist = ORDER_STATUSES.reduce((acc,s) => { acc[s] = adminOrders.filter(o => (o.status||'待確認') === s).length; return acc; }, {});
 
-  // âââââââââââââââââââââââââââââââââââââââââââââââââââ
+  // ═══════════════════════════════════════════════════
   // RENDER: FRONTEND
-  // âââââââââââââââââââââââââââââââââââââââââââââââââââ
+  // ═══════════════════════════════════════════════════
 
   const renderNav = () => (
     <nav style={S.nav} className="no-print">
-      {/* ââ AMC Brand ââ */}
-      <div style={S.navBrand} onClick={goShop} role="button" tabIndex={0} title="åé¦é "
+      {/* ── AMC Brand ── */}
+      <div style={S.navBrand} onClick={goShop} role="button" tabIndex={0} title="回首頁"
         onKeyDown={e => e.key === 'Enter' && goShop()}>
-        {/* Logo Mark */}
-        <div style={S.navLogoMark} className="amc-logo-mark">
-          <span style={S.navLogoText}>AMC</span>
-        </div>
-        {/* Title group */}
-        <div style={S.navTitleGroup}>
-          <span style={S.navTitleMain}>å®ç¿æ¨å¨</span>
-          <span style={S.navTitleSub} className="amc-subtitle">Alliance Music Company</span>
-        </div>
+        <img src="/logo.png" alt="AMC 宏睿樂器" style={{height:'48px',objectFit:'contain'}} />
       </div>
 
-      {/* ââ Right nav ââ */}
+      {/* ── Right nav ── */}
       <div style={S.navRight}>
-        <button style={S.navBtn} onClick={() => { setPage('orders'); setSelectedProductId(null); loadOrders(); }}>æçè¨å®</button>
+        <button style={S.navBtn} onClick={() => { setPage('orders'); setSelectedProductId(null); loadOrders(); }}>我的訂單</button>
         <button style={S.navBtn} onClick={() => setCartOpen(true)}>
-          ð {cartCount > 0 && <span style={S.badge}>{cartCount}</span>}
+          🛒 {cartCount > 0 && <span style={S.badge}>{cartCount}</span>}
         </button>
         <button style={S.navAdminBtn} onClick={() => {
           if (isAdminLoggedIn) {
@@ -786,25 +778,25 @@ export default function App() {
           } else {
             setAdminLoginModal(true); setAdminPasswordInput(''); setAdminPasswordError(false);
           }
-        }} title="ç®¡çå¾å°">âï¸ ç®¡çå¾å°</button>
+        }} title="管理後台">⚙️ 管理後台</button>
       </div>
     </nav>
   );
 
-  // ââ Category collection tiles (homepage quick-nav) ââ
+  // ── Category collection tiles (homepage quick-nav) ──
   const CAT_TILES = [
-    { key:'åä»/è²æ¯',    label:'GUITARS & BASS',  sub:'åä»/è²æ¯',   bg:'#1a1a1a', fg:'#fff', icon:'ð¸' },
-    { key:'ææå¨/é³ç®±',  label:'FX & AMPLIFIERS', sub:'ææå¨/é³ç®±', bg:'#1a2538', fg:'#fff', icon:'ð' },
-    { key:'éµç¤/åæå¨',  label:'KEYS & SYNTHS',   sub:'éµç¤/åæå¨', bg:'#1e1a2a', fg:'#fff', icon:'ð¹' },
-    { key:'é¼/ææ',      label:'DRUMS & PERC',    sub:'é¼/ææ',     bg:'#2a1a0e', fg:'#fff', icon:'ð¥' },
-    { key:'å¼¦',           label:'STRINGS',         sub:'å¼¦',          bg:'#0e2a1a', fg:'#fff', icon:'ðµ' },
-    { key:'ç·æ/éä»¶',    label:'CABLES & ACC',    sub:'ç·æ/éä»¶',   bg:'#1f1f1f', fg:'#fff', icon:'ð' },
+    { key:'吉他/貝斯',    label:'GUITARS & BASS',  sub:'吉他/貝斯',   bg:'#1a1a1a', fg:'#fff', icon:'🎸' },
+    { key:'效果器/音箱',  label:'FX & AMPLIFIERS', sub:'效果器/音箱', bg:'#1a2538', fg:'#fff', icon:'🎛' },
+    { key:'鍵盤/合成器',  label:'KEYS & SYNTHS',   sub:'鍵盤/合成器', bg:'#1e1a2a', fg:'#fff', icon:'🎹' },
+    { key:'鼓/打擊',      label:'DRUMS & PERC',    sub:'鼓/打擊',     bg:'#2a1a0e', fg:'#fff', icon:'🥁' },
+    { key:'弦',           label:'STRINGS',         sub:'弦',          bg:'#0e2a1a', fg:'#fff', icon:'🎵' },
+    { key:'線材/配件',    label:'CABLES & ACC',    sub:'線材/配件',   bg:'#1f1f1f', fg:'#fff', icon:'🔌' },
   ];
 
   const renderShop = () => (
     <div>
-      {/* ââ Hero Banner Carousel ââ */}
-      {page === 'shop' && !searchQuery && categoryFilter === 'å¨é¨' && brandFilter === 'å¨é¨' && bannerSlides.length > 0 && (
+      {/* ── Hero Banner Carousel ── */}
+      {page === 'shop' && !searchQuery && categoryFilter === '全部' && brandFilter === '全部' && bannerSlides.length > 0 && (
         <div
           style={{ ...S.bannerWrap, minHeight: bannerSlides[bannerIdx]?.image_url ? 420 : 380 }}
           className="no-print"
@@ -840,7 +832,7 @@ export default function App() {
                     <button
                       style={{ padding:'13px 28px', background:'transparent', color:'#fff', border:'1px solid rgba(255,255,255,.4)', cursor:'pointer', fontWeight:600, fontSize:13, letterSpacing:'0.06em' }}
                       onClick={() => document.getElementById('shop-grid')?.scrollIntoView({behavior:'smooth'})}
-                    >çè¦½å¨é¨åå</button>
+                    >瀏覽全部商品</button>
                   )}
                 </div>
               </div>
@@ -852,10 +844,10 @@ export default function App() {
             <>
               <button style={S.bannerArrowLeft}
                 onClick={() => { setBannerIdx(i => (i - 1 + bannerSlides.length) % bannerSlides.length); setBannerPaused(true); }}
-              >â¹</button>
+              >‹</button>
               <button style={S.bannerArrowRight}
                 onClick={() => { setBannerIdx(i => (i + 1) % bannerSlides.length); setBannerPaused(true); }}
-              >âº</button>
+              >›</button>
             </>
           )}
 
@@ -872,8 +864,8 @@ export default function App() {
         </div>
       )}
 
-      {/* ââ Category Collection Grid ââ */}
-      {page === 'shop' && !searchQuery && categoryFilter === 'å¨é¨' && brandFilter === 'å¨é¨' && (
+      {/* ── Category Collection Grid ── */}
+      {page === 'shop' && !searchQuery && categoryFilter === '全部' && brandFilter === '全部' && (
         <div style={{ background:'#111' }} className="no-print">
           <div style={{ maxWidth:1280, margin:'0 auto', padding:'0' }}>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))', gap:1 }}>
@@ -894,10 +886,10 @@ export default function App() {
         </div>
       )}
 
-      {/* ââ Sidebar + Products ââ */}
+      {/* ── Sidebar + Products ── */}
       <div id="shop-grid" style={S.shopWrapper}>
 
-        {/* ââ LEFT SIDEBAR ââ */}
+        {/* ── LEFT SIDEBAR ── */}
         <aside style={S.shopSidebar} className="no-print shop-sidebar-hide">
           {/* Logo / Home */}
           <button style={S.shopSidebarLogo} onClick={goShop}>
@@ -905,21 +897,21 @@ export default function App() {
               <span style={{ color:'#fff', fontSize:10, fontWeight:700, letterSpacing:'0.5px' }}>AMC</span>
             </div>
             <div style={{ display:'flex', flexDirection:'column', lineHeight:1.2 }}>
-              <span style={{ fontSize:12, fontWeight:700, color:C.text }}>å®ç¿æ¨å¨</span>
-              <span style={{ fontSize:9, color:'#999' }}>ææåå</span>
+              <span style={{ fontSize:12, fontWeight:700, color:C.text }}>宏睿樂器</span>
+              <span style={{ fontSize:9, color:'#999' }}>所有商品</span>
             </div>
           </button>
 
           {/* Categories */}
           <div style={S.shopSidebarSection}>
-            <div style={S.shopSidebarSectionTitle}>åååé¡</div>
+            <div style={S.shopSidebarSectionTitle}>商品分類</div>
             {CATEGORIES.map(c => (
               <button
                 key={c}
                 style={categoryFilter === c ? S.shopSidebarItemActive : S.shopSidebarItem}
-                onClick={() => { setCategoryFilter(c); setBrandFilter('å¨é¨'); }}
+                onClick={() => { setCategoryFilter(c); setBrandFilter('全部'); }}
               >
-                {c === 'å¨é¨' ? 'ð¼ ææåå' : c}
+                {c === '全部' ? '🎼 所有商品' : c}
               </button>
             ))}
           </div>
@@ -929,12 +921,12 @@ export default function App() {
           {/* Brands */}
           {brands.length > 0 && (
             <div style={S.shopSidebarSection}>
-              <div style={S.shopSidebarSectionTitle}>åç ({brands.length})</div>
+              <div style={S.shopSidebarSectionTitle}>品牌 ({brands.length})</div>
               <div style={{ maxHeight:300, overflowY:'auto' }}>
                 <button
-                  style={brandFilter === 'å¨é¨' ? S.shopSidebarItemActive : S.shopSidebarItem}
-                  onClick={() => setBrandFilter('å¨é¨')}
-                >ææåç</button>
+                  style={brandFilter === '全部' ? S.shopSidebarItemActive : S.shopSidebarItem}
+                  onClick={() => setBrandFilter('全部')}
+                >所有品牌</button>
                 {[...brands].sort((a,b) => a.name.localeCompare(b.name, 'en')).map(b => (
                   <button
                     key={b.id}
@@ -947,59 +939,59 @@ export default function App() {
           )}
 
           {/* Clear filters */}
-          {(categoryFilter !== 'å¨é¨' || brandFilter !== 'å¨é¨' || searchQuery) && (
+          {(categoryFilter !== '全部' || brandFilter !== '全部' || searchQuery) && (
             <>
               <div style={S.shopSidebarDivider} />
               <div style={{ padding:'8px 20px 16px' }}>
                 <button
                   style={{ width:'100%', padding:'8px 0', background:C.text, color:'#fff', border:'none', cursor:'pointer', fontSize:12, fontWeight:600, letterSpacing:'0.05em' }}
-                  onClick={() => { setCategoryFilter('å¨é¨'); setBrandFilter('å¨é¨'); setSearchQuery(''); }}
-                >â æ¸é¤ææç¯©é¸</button>
+                  onClick={() => { setCategoryFilter('全部'); setBrandFilter('全部'); setSearchQuery(''); }}
+                >✕ 清除所有篩選</button>
               </div>
             </>
           )}
         </aside>
 
-        {/* ââ MAIN CONTENT ââ */}
+        {/* ── MAIN CONTENT ── */}
         <div style={S.shopMain}>
           <div style={{ padding:'20px 24px' }}>
             {/* Search + Sort bar */}
             <div style={{ ...S.filterBar, marginBottom:16 }} className="no-print">
               <div style={S.searchWrap}>
-                <span style={S.searchIcon}>ð</span>
+                <span style={S.searchIcon}>🔍</span>
                 <input
                   style={S.searchInput}
-                  placeholder="æå°åååç¨±ãè²¨èãåç..."
+                  placeholder="搜尋商品名稱、貨號、品牌..."
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   onFocus={e => { e.target.style.borderColor = C.primary; e.target.style.boxShadow = `0 0 0 2px ${C.primary}22`; }}
                   onBlur={e => { e.target.style.borderColor = C.border; e.target.style.boxShadow = 'none'; }}
                 />
                 {searchQuery && (
-                  <button style={S.searchClear} onClick={() => setSearchQuery('')} title="æ¸é¤">â</button>
+                  <button style={S.searchClear} onClick={() => setSearchQuery('')} title="清除">✕</button>
                 )}
               </div>
               <select style={{ ...S.select, marginLeft:'auto' }} value={sortOrder} onChange={e => setSortOrder(e.target.value)}>
-                <option value="default">é è¨­æåº</option>
-                <option value="price_asc">å¹æ ¼ï¼ä½ â é«</option>
-                <option value="price_desc">å¹æ ¼ï¼é« â ä½</option>
-                <option value="newest">ææ°ä¸æ¶</option>
+                <option value="default">預設排序</option>
+                <option value="price_asc">價格：低 → 高</option>
+                <option value="price_desc">價格：高 → 低</option>
+                <option value="newest">最新上架</option>
               </select>
             </div>
 
             {/* Active filter chips */}
-            {(categoryFilter !== 'å¨é¨' || brandFilter !== 'å¨é¨') && (
+            {(categoryFilter !== '全部' || brandFilter !== '全部') && (
               <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginBottom:12 }} className="no-print">
-                {categoryFilter !== 'å¨é¨' && (
+                {categoryFilter !== '全部' && (
                   <span style={{ display:'inline-flex', alignItems:'center', gap:4, padding:'4px 10px', background:'#111', color:'#fff', fontSize:12, fontWeight:500 }}>
                     {categoryFilter}
-                    <button style={{ background:'none', border:'none', color:'#fff', cursor:'pointer', fontSize:12, padding:'0 0 0 4px', lineHeight:1 }} onClick={() => setCategoryFilter('å¨é¨')}>â</button>
+                    <button style={{ background:'none', border:'none', color:'#fff', cursor:'pointer', fontSize:12, padding:'0 0 0 4px', lineHeight:1 }} onClick={() => setCategoryFilter('全部')}>✕</button>
                   </span>
                 )}
-                {brandFilter !== 'å¨é¨' && (
+                {brandFilter !== '全部' && (
                   <span style={{ display:'inline-flex', alignItems:'center', gap:4, padding:'4px 10px', background:'#111', color:'#fff', fontSize:12, fontWeight:500 }}>
                     {brands.find(b => String(b.id) === brandFilter)?.name || brandFilter}
-                    <button style={{ background:'none', border:'none', color:'#fff', cursor:'pointer', fontSize:12, padding:'0 0 0 4px', lineHeight:1 }} onClick={() => setBrandFilter('å¨é¨')}>â</button>
+                    <button style={{ background:'none', border:'none', color:'#fff', cursor:'pointer', fontSize:12, padding:'0 0 0 4px', lineHeight:1 }} onClick={() => setBrandFilter('全部')}>✕</button>
                   </span>
                 )}
               </div>
@@ -1008,21 +1000,21 @@ export default function App() {
             {/* Search status */}
             {searchQuery.trim() && !loading && (
               <div style={S.searchStatus}>
-                <span>æå°ã{searchQuery.trim()}ãï¼å± <strong>{filtered.length}</strong> åçµæ{hasActiveFilter && <span>ï¼å·²å¥ç¨ç¯©é¸ï¼</span>}</span>
-                <button style={S.searchStatusClear} onClick={() => setSearchQuery('')}>æ¸é¤æå°</button>
+                <span>搜尋「{searchQuery.trim()}」，共 <strong>{filtered.length}</strong> 個結果{hasActiveFilter && <span>（已套用篩選）</span>}</span>
+                <button style={S.searchStatusClear} onClick={() => setSearchQuery('')}>清除搜尋</button>
               </div>
             )}
 
             {/* Product grid */}
             {loading ? (
-              <div style={S.center}><div style={S.spinner} /><p>è¼å¥ååä¸­...</p></div>
+              <div style={S.center}><div style={S.spinner} /><p>載入商品中...</p></div>
             ) : error ? (
-              <div style={S.center}><p style={{ color:C.danger }}>è¼å¥å¤±æï¼{error}</p><button style={S.retryBtn} onClick={loadData}>éè©¦</button></div>
+              <div style={S.center}><p style={{ color:C.danger }}>載入失敗：{error}</p><button style={S.retryBtn} onClick={loadData}>重試</button></div>
             ) : filtered.length === 0 ? (
               <div style={{ ...S.empty, display:'flex', flexDirection:'column', alignItems:'center', gap:12 }}>
                 {searchQuery.trim()
-                  ? <>æ¾ä¸å°ç¬¦åã{searchQuery.trim()}ãçåå<br/><button style={{ ...S.searchStatusClear, fontSize:14 }} onClick={() => setSearchQuery('')}>æ¸é¤æå°</button></>
-                  : 'æ­¤åé¡ç®åæ²æåå'}
+                  ? <>找不到符合「{searchQuery.trim()}」的商品<br/><button style={{ ...S.searchStatusClear, fontSize:14 }} onClick={() => setSearchQuery('')}>清除搜尋</button></>
+                  : '此分類目前沒有商品'}
               </div>
             ) : (
               <div style={S.grid} className="grid-responsive">
@@ -1032,19 +1024,19 @@ export default function App() {
                       {p.image_url ? (
                         <img src={p.image_url} alt={p.name} style={{ width:'100%', height:180, objectFit:'cover', display:'block' }} />
                       ) : (
-                        <div style={S.cardImg}>æ«ç¡åç</div>
+                        <div style={S.cardImg}>暫無圖片</div>
                       )}
                     </div>
                     <div style={S.cardBody}>
                       <div style={S.cardName} onClick={() => openDetail(p.id)}>{p.name}</div>
-                      <div style={S.cardBrand}>{p.brands?.name || 'â'}</div>
-                      <div style={S.cardSku}>è²¨èï¼{p.sku || 'â'}</div>
-                      <div style={S.cardPrice}>{p.price > 0 ? `NT$ ${p.price.toLocaleString()}` : 'æ´½è©¢å¹æ ¼'}</div>
+                      <div style={S.cardBrand}>{p.brands?.name || '—'}</div>
+                      <div style={S.cardSku}>貨號：{p.sku || '—'}</div>
+                      <div style={S.cardPrice}>{p.price > 0 ? `NT$ ${p.price.toLocaleString()}` : '洽詢價格'}</div>
                       <div style={S.cardActions}>
                         <input type="number" min="1" value={quantities[p.id]||1} onChange={e => setQuantities(prev => ({ ...prev, [p.id]: Math.max(1, parseInt(e.target.value)||1) }))} style={S.qtyInput} onClick={e => e.stopPropagation()} />
-                        <button style={S.addBtn} onClick={e => { e.stopPropagation(); addToCart(p); }}>å å¥è³¼ç©è»</button>
+                        <button style={S.addBtn} onClick={e => { e.stopPropagation(); addToCart(p); }}>加入購物車</button>
                       </div>
-                      <button style={S.detailBtn} onClick={() => openDetail(p.id)}>æ¥çè©³æ â</button>
+                      <button style={S.detailBtn} onClick={() => openDetail(p.id)}>查看詳情 →</button>
                     </div>
                   </div>
                 ))}
@@ -1061,8 +1053,8 @@ export default function App() {
     const product = products.find(p => p.id === selectedProductId);
     if (!product) return (
       <div style={S.container}>
-        <button style={S.detailBack} onClick={goShop}>â è¿åååç®é</button>
-        <div style={S.empty}>æ¾ä¸å°ååï¼å¯è½å·²ä¸æ¶</div>
+        <button style={S.detailBack} onClick={goShop}>← 返回商品目錄</button>
+        <div style={S.empty}>找不到商品，可能已下架</div>
       </div>
     );
 
@@ -1074,7 +1066,7 @@ export default function App() {
 
     return (
       <div style={S.detailContainer}>
-        <button style={S.detailBack} onClick={goShop}>â è¿åååç®é</button>
+        <button style={S.detailBack} onClick={goShop}>← 返回商品目錄</button>
 
         <div style={S.detailLayout} className="detail-layout">
           {/* Left: Image */}
@@ -1082,7 +1074,7 @@ export default function App() {
             {product.image_url ? (
               <img src={product.image_url} alt={product.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block', minHeight:340 }} />
             ) : (
-              <span style={{ color:C.textLight, fontSize:16 }}>æ«ç¡åç</span>
+              <span style={{ color:C.textLight, fontSize:16 }}>暫無圖片</span>
             )}
           </div>
 
@@ -1090,9 +1082,9 @@ export default function App() {
           <div style={S.detailInfoBox}>
             <h1 style={S.detailName}>{product.name}</h1>
             {product.brands?.name && <div style={S.detailBrand}>{product.brands.name}</div>}
-            {product.sku && <div style={S.detailSku}>è²¨èï¼{product.sku}</div>}
+            {product.sku && <div style={S.detailSku}>貨號：{product.sku}</div>}
             <div style={S.detailPrice}>
-              {product.price > 0 ? `NT$ ${product.price.toLocaleString()}` : 'æ´½è©¢å¹æ ¼'}
+              {product.price > 0 ? `NT$ ${product.price.toLocaleString()}` : '洽詢價格'}
             </div>
             <div style={S.detailTagRow}>
               {product.category && <span style={S.detailCatTag}>{product.category}</span>}
@@ -1111,7 +1103,7 @@ export default function App() {
                 style={detailAddedMsg ? S.detailAddedBtn : S.detailAddBtn}
                 onClick={handleDetailAddToCart}
               >
-                {detailAddedMsg ? 'å·²å å¥è³¼ç©è» â' : 'å å¥è³¼ç©è»'}
+                {detailAddedMsg ? '已加入購物車 ✓' : '加入購物車'}
               </button>
             </div>
           </div>
@@ -1119,15 +1111,15 @@ export default function App() {
 
         {/* Description */}
         <div style={S.detailDescSection}>
-          <h2 style={S.detailDescTitle}>ååä»ç´¹</h2>
+          <h2 style={S.detailDescTitle}>商品介紹</h2>
           {product.description ? (
             <div style={S.detailDescText}>{product.description}</div>
           ) : (
-            <div style={S.detailDescEmpty}>æ«ç¡ååæè¿°</div>
+            <div style={S.detailDescEmpty}>暫無商品描述</div>
           )}
         </div>
 
-        {/* æ¨è¦ååï¼ååçåªåï¼ä¸è¶³è£åé¡å¥ï¼æå¤ 4 å */}
+        {/* 推薦商品：同品牌優先，不足補同類別，最多 4 個 */}
         {(() => {
           const sameBrand = products.filter(p => p.id !== product.id && p.brand_id === product.brand_id);
           const sameCat   = products.filter(p => p.id !== product.id && p.brand_id !== product.brand_id && p.category === product.category);
@@ -1135,7 +1127,7 @@ export default function App() {
           if (recs.length === 0) return null;
           return (
             <div style={S.recSection}>
-              <h2 style={S.recTitle}>ä½ å¯è½ä¹åæ­¡</h2>
+              <h2 style={S.recTitle}>你可能也喜歡</h2>
               <div style={S.recGrid}>
                 {recs.map(r => (
                   <div key={r.id} style={S.recCard}
@@ -1145,11 +1137,11 @@ export default function App() {
                   >
                     {r.image_url
                       ? <img src={r.image_url} alt={r.name} style={S.recImg} />
-                      : <div style={S.recImgPlaceholder}>æ«ç¡åç</div>}
+                      : <div style={S.recImgPlaceholder}>暫無圖片</div>}
                     <div style={S.recBody}>
                       <div style={S.recName} title={r.name}>{r.name}</div>
-                      <div style={S.recBrand}>{r.brands?.name || 'â'}</div>
-                      <div style={S.recPrice}>{r.price > 0 ? `NT$ ${r.price.toLocaleString()}` : 'æ´½è©¢å¹æ ¼'}</div>
+                      <div style={S.recBrand}>{r.brands?.name || '—'}</div>
+                      <div style={S.recPrice}>{r.price > 0 ? `NT$ ${r.price.toLocaleString()}` : '洽詢價格'}</div>
                     </div>
                   </div>
                 ))}
@@ -1166,26 +1158,26 @@ export default function App() {
       <div style={S.overlay} onClick={() => setCartOpen(false)} />
       <div style={S.sidebar}>
         <div style={S.sidebarHeader}>
-          <h2 style={{ margin:0, fontSize:18 }}>è³¼ç©è»</h2>
-          <button onClick={() => setCartOpen(false)} style={{ background:'none', border:'none', fontSize:20, cursor:'pointer' }}>â</button>
+          <h2 style={{ margin:0, fontSize:18 }}>購物車</h2>
+          <button onClick={() => setCartOpen(false)} style={{ background:'none', border:'none', fontSize:20, cursor:'pointer' }}>✕</button>
         </div>
         <div style={S.sidebarBody}>
-          {cart.length === 0 ? <div style={S.empty}>è³¼ç©è»æ¯ç©ºç</div> : cart.map(item => (
+          {cart.length === 0 ? <div style={S.empty}>購物車是空的</div> : cart.map(item => (
             <div key={item.id} style={S.cartItem}>
-              {/* ç¸®å */}
+              {/* 縮圖 */}
               <div style={S.cartThumb}>
                 {item.image_url
                   ? <img src={item.image_url} alt={item.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
-                  : 'ð¸'}
+                  : '🎸'}
               </div>
               <div style={S.cartItemInfo}>
                 <div style={S.cartItemName}>{item.name}</div>
-                <div style={S.cartItemPrice}>NT$ {item.price.toLocaleString()} Ã {item.quantity} = NT$ {(item.price*item.quantity).toLocaleString()}</div>
+                <div style={S.cartItemPrice}>NT$ {item.price.toLocaleString()} × {item.quantity} = NT$ {(item.price*item.quantity).toLocaleString()}</div>
                 <div style={S.cartQtyGroup}>
-                  <button style={S.cartQtyBtn} onClick={() => updateCartQty(item.id,-1)}>â</button>
+                  <button style={S.cartQtyBtn} onClick={() => updateCartQty(item.id,-1)}>−</button>
                   <span style={S.cartQtyNum}>{item.quantity}</span>
                   <button style={S.cartQtyBtn} onClick={() => updateCartQty(item.id,1)}>+</button>
-                  <button style={S.removeBtn} onClick={() => removeFromCart(item.id)}>åªé¤</button>
+                  <button style={S.removeBtn} onClick={() => removeFromCart(item.id)}>刪除</button>
                 </div>
               </div>
             </div>
@@ -1193,8 +1185,8 @@ export default function App() {
         </div>
         {cart.length > 0 && (
           <div style={S.sidebarFooter}>
-            <div style={S.totalRow}><span>ç¸½è¨</span><span>NT$ {cartTotal.toLocaleString()}</span></div>
-            <button style={S.submitBtn} onClick={() => setModalOpen(true)}>éåºè¨å®</button>
+            <div style={S.totalRow}><span>總計</span><span>NT$ {cartTotal.toLocaleString()}</span></div>
+            <button style={S.submitBtn} onClick={() => setModalOpen(true)}>送出訂單</button>
           </div>
         )}
       </div>
@@ -1204,24 +1196,24 @@ export default function App() {
   const renderModal = () => modalOpen && (
     <div style={S.modal} onClick={e => e.target===e.currentTarget && setModalOpen(false)}>
       <div style={S.modalBox}>
-        <h2 style={S.modalTitle}>è¨è³¼è³è¨</h2>
+        <h2 style={S.modalTitle}>訂購資訊</h2>
         <div style={S.formGroup}>
-          <label style={S.label}>å§å *</label>
-          <input style={formErrors.name ? S.inputError : S.input} value={formData.name} onChange={e => { setFormData(f => ({ ...f, name:e.target.value })); setFormErrors(fe => ({ ...fe, name:'' })); }} placeholder="è«è¼¸å¥å§å" />
+          <label style={S.label}>姓名 *</label>
+          <input style={formErrors.name ? S.inputError : S.input} value={formData.name} onChange={e => { setFormData(f => ({ ...f, name:e.target.value })); setFormErrors(fe => ({ ...fe, name:'' })); }} placeholder="請輸入姓名" />
           {formErrors.name && <div style={S.errorText}>{formErrors.name}</div>}
         </div>
         <div style={S.formGroup}>
-          <label style={S.label}>è¯çµ¡æ¹å¼ *</label>
-          <input style={formErrors.contact ? S.inputError : S.input} value={formData.contact} onChange={e => { setFormData(f => ({ ...f, contact:e.target.value })); setFormErrors(fe => ({ ...fe, contact:'' })); }} placeholder="ææ©æ LINE ID" />
+          <label style={S.label}>聯絡方式 *</label>
+          <input style={formErrors.contact ? S.inputError : S.input} value={formData.contact} onChange={e => { setFormData(f => ({ ...f, contact:e.target.value })); setFormErrors(fe => ({ ...fe, contact:'' })); }} placeholder="手機或 LINE ID" />
           {formErrors.contact && <div style={S.errorText}>{formErrors.contact}</div>}
         </div>
         <div style={S.formGroup}>
-          <label style={S.label}>åè¨»</label>
-          <textarea style={S.textarea} value={formData.notes} onChange={e => setFormData(f => ({ ...f, notes:e.target.value }))} placeholder="é¸å¡«" />
+          <label style={S.label}>備註</label>
+          <textarea style={S.textarea} value={formData.notes} onChange={e => setFormData(f => ({ ...f, notes:e.target.value }))} placeholder="選填" />
         </div>
         <div style={S.modalActions}>
-          <button style={S.cancelBtn} onClick={() => setModalOpen(false)}>è¿åä¿®æ¹</button>
-          <button style={submitting ? S.disabledBtn : S.confirmBtn} disabled={submitting} onClick={handleSubmitOrder}>{submitting ? 'éåºä¸­...' : 'ç¢ºèªéåº'}</button>
+          <button style={S.cancelBtn} onClick={() => setModalOpen(false)}>返回修改</button>
+          <button style={submitting ? S.disabledBtn : S.confirmBtn} disabled={submitting} onClick={handleSubmitOrder}>{submitting ? '送出中...' : '確認送出'}</button>
         </div>
       </div>
     </div>
@@ -1229,23 +1221,23 @@ export default function App() {
 
   const renderConfirm = () => confirmedOrder && (
     <div style={S.confirmPage}>
-      <div style={S.checkIcon}>â</div>
-      <h2 style={S.confirmTitle}>è¨å®å·²éåº</h2>
-      <div style={S.confirmOrderNum}>è¨å®ç·¨èï¼{confirmedOrder.order_number}</div>
+      <div style={S.checkIcon}>✅</div>
+      <h2 style={S.confirmTitle}>訂單已送出</h2>
+      <div style={S.confirmOrderNum}>訂單編號：{confirmedOrder.order_number}</div>
       <div style={S.infoBox}>
-        <div style={S.infoRow}><span>è¨è³¼è</span><span>{confirmedOrder.customer_name}</span></div>
-        <div style={S.infoRow}><span>è¯çµ¡æ¹å¼</span><span>{confirmedOrder.contact}</span></div>
-        {confirmedOrder.notes && <div style={S.infoRow}><span>åè¨»</span><span>{confirmedOrder.notes}</span></div>}
-        <div style={S.infoRow}><span>ä¸å®æé</span><span>{formatDate(confirmedOrder.orderTime)}</span></div>
+        <div style={S.infoRow}><span>訂購者</span><span>{confirmedOrder.customer_name}</span></div>
+        <div style={S.infoRow}><span>聯絡方式</span><span>{confirmedOrder.contact}</span></div>
+        {confirmedOrder.notes && <div style={S.infoRow}><span>備註</span><span>{confirmedOrder.notes}</span></div>}
+        <div style={S.infoRow}><span>下單時間</span><span>{formatDate(confirmedOrder.orderTime)}</span></div>
       </div>
       <table style={S.table}>
-        <thead><tr><th style={S.th}>åå</th><th style={{...S.th,textAlign:'center'}}>æ¸é</th><th style={{...S.th,textAlign:'right'}}>å®å¹</th><th style={{...S.th,textAlign:'right'}}>å°è¨</th></tr></thead>
+        <thead><tr><th style={S.th}>商品</th><th style={{...S.th,textAlign:'center'}}>數量</th><th style={{...S.th,textAlign:'right'}}>單價</th><th style={{...S.th,textAlign:'right'}}>小計</th></tr></thead>
         <tbody>{confirmedOrder.items.map((item,i) => (<tr key={i}><td style={S.td}>{item.name}</td><td style={{...S.td,textAlign:'center'}}>{item.quantity}</td><td style={{...S.td,textAlign:'right'}}>NT$ {item.price.toLocaleString()}</td><td style={{...S.td,textAlign:'right'}}>NT$ {(item.price*item.quantity).toLocaleString()}</td></tr>))}</tbody>
-        <tfoot><tr><td colSpan={3} style={{...S.td,fontWeight:700,textAlign:'right'}}>ç¸½è¨</td><td style={{...S.td,fontWeight:700,textAlign:'right',color:C.primary}}>NT$ {confirmedOrder.total_amount.toLocaleString()}</td></tr></tfoot>
+        <tfoot><tr><td colSpan={3} style={{...S.td,fontWeight:700,textAlign:'right'}}>總計</td><td style={{...S.td,fontWeight:700,textAlign:'right',color:C.primary}}>NT$ {confirmedOrder.total_amount.toLocaleString()}</td></tr></tfoot>
       </table>
       <div className="no-print">
-        <button style={S.continueBtn} onClick={goShop}>ç¹¼çºé¸è³¼</button>
-        <button style={S.printBtn} onClick={() => window.print()}>åå°è¨å®</button>
+        <button style={S.continueBtn} onClick={goShop}>繼續選購</button>
+        <button style={S.printBtn} onClick={() => window.print()}>列印訂單</button>
       </div>
     </div>
   );
@@ -1253,13 +1245,13 @@ export default function App() {
   const renderOrders = () => (
     <div style={S.container}>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20, flexWrap:'wrap', gap:10 }}>
-        <h2 style={{ fontSize:20, fontWeight:700, margin:0 }}>æçè¨å®</h2>
+        <h2 style={{ fontSize:20, fontWeight:700, margin:0 }}>我的訂單</h2>
         {myContact && (
           <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-            <span style={{ fontSize:13, color:C.textLight }}>æ¥è©¢è¯çµ¡ï¼{myContact}</span>
+            <span style={{ fontSize:13, color:C.textLight }}>查詢聯絡：{myContact}</span>
             <button style={{ ...S.btnSm, background:'transparent', color:C.textLight, border:`1px solid ${C.border}` }}
               onClick={() => { localStorage.removeItem('myContact'); setMyContact(''); setOrders([]); setContactLookup(''); }}>
-              åæå¸³è
+              切換帳號
             </button>
           </div>
         )}
@@ -1267,11 +1259,11 @@ export default function App() {
 
       {!myContact ? (
         <div style={{ maxWidth:420, margin:'60px auto', textAlign:'center' }}>
-          <div style={{ fontSize:40, marginBottom:16 }}>ð</div>
-          <p style={{ marginBottom:20, color:C.textLight }}>è«è¼¸å¥æ¨ä¸å®æä½¿ç¨çè¯çµ¡æ¹å¼ï¼é»è©±æ Emailï¼ä¾æ¥è©¢è¨å®ã</p>
+          <div style={{ fontSize:40, marginBottom:16 }}>📋</div>
+          <p style={{ marginBottom:20, color:C.textLight }}>請輸入您下單時使用的聯絡方式（電話或 Email）來查詢訂單。</p>
           <input
             style={{ ...S.input, marginBottom:12, textAlign:'center' }}
-            placeholder="è¼¸å¥é»è©± / Email"
+            placeholder="輸入電話 / Email"
             value={contactLookup}
             onChange={e => setContactLookup(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && contactLookup.trim()) { const c = contactLookup.trim(); localStorage.setItem('myContact', c); setMyContact(c); loadOrders(c); } }}
@@ -1279,32 +1271,32 @@ export default function App() {
           <button style={{ ...S.submitBtn, width:'100%' }}
             disabled={!contactLookup.trim()}
             onClick={() => { const c = contactLookup.trim(); if (!c) return; localStorage.setItem('myContact', c); setMyContact(c); loadOrders(c); }}>
-            æ¥è©¢æçè¨å®
+            查詢我的訂單
           </button>
         </div>
       ) : ordersLoading ? (
-        <div style={S.center}><div style={S.spinner} /><p>è¼å¥è¨å®ä¸­...</p></div>
+        <div style={S.center}><div style={S.spinner} /><p>載入訂單中...</p></div>
       ) : orders.length === 0 ? (
-        <div style={S.empty}>æ¥ç¡æ­¤è¯çµ¡æ¹å¼çè¨å®è¨é</div>
+        <div style={S.empty}>查無此聯絡方式的訂單記錄</div>
       ) : orders.map(o => (
         <div key={o.id} style={S.orderCard}>
           <div style={S.orderHeader} onClick={() => setExpandedOrder(expandedOrder===o.id ? null : o.id)}>
             <div style={S.orderHeaderLeft}>
               <span style={S.orderNum}>{o.order_number}</span>
-              <span style={S.orderDate}>{formatDate(o.created_at)} Â· {o.customer_name}</span>
+              <span style={S.orderDate}>{formatDate(o.created_at)} · {o.customer_name}</span>
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:12 }}>
               <span style={S.orderAmount}>NT$ {o.total_amount?.toLocaleString()}</span>
-              <span>{expandedOrder===o.id ? 'â²' : 'â¼'}</span>
+              <span>{expandedOrder===o.id ? '▲' : '▼'}</span>
             </div>
           </div>
           {expandedOrder===o.id && o.order_items && (
             <div style={S.orderDetail}>
               <table style={{...S.table,marginTop:12}}>
-                <thead><tr><th style={S.th}>åå</th><th style={{...S.th,textAlign:'center'}}>æ¸é</th><th style={{...S.th,textAlign:'right'}}>å®å¹</th><th style={{...S.th,textAlign:'right'}}>å°è¨</th></tr></thead>
+                <thead><tr><th style={S.th}>商品</th><th style={{...S.th,textAlign:'center'}}>數量</th><th style={{...S.th,textAlign:'right'}}>單價</th><th style={{...S.th,textAlign:'right'}}>小計</th></tr></thead>
                 <tbody>{o.order_items.map((item,i) => (<tr key={i}><td style={S.td}>{item.product_name}</td><td style={{...S.td,textAlign:'center'}}>{item.quantity}</td><td style={{...S.td,textAlign:'right'}}>NT$ {item.unit_price?.toLocaleString()}</td><td style={{...S.td,textAlign:'right'}}>NT$ {item.subtotal?.toLocaleString()}</td></tr>))}</tbody>
               </table>
-              {o.notes && <div style={{ fontSize:13,color:C.textLight,marginTop:8 }}>åè¨»ï¼{o.notes}</div>}
+              {o.notes && <div style={{ fontSize:13,color:C.textLight,marginTop:8 }}>備註：{o.notes}</div>}
             </div>
           )}
         </div>
@@ -1312,18 +1304,18 @@ export default function App() {
     </div>
   );
 
-  // âââââââââââââââââââââââââââââââââââââââââââââââââââ
+  // ═══════════════════════════════════════════════════
   // RENDER: ADMIN
-  // âââââââââââââââââââââââââââââââââââââââââââââââââââ
+  // ═══════════════════════════════════════════════════
 
   const renderDashboard = () => (
     <div>
       <div style={S.statsGrid} className="stats-grid-responsive">
         {[
-          { icon:'ð¦', label:'ååç¸½æ¸', value: adminProducts.length },
-          { icon:'â', label:'ä¸æ¶ä¸­åå', value: adminProducts.filter(p => p.status==='ä¸æ¶ä¸­').length },
-          { icon:'ð', label:'è¨å®ç¸½æ¸', value: adminOrders.length },
-          { icon:'ð°', label:'ç¸½çæ¶', value: `NT$ ${totalRevenue.toLocaleString()}` },
+          { icon:'📦', label:'商品總數', value: adminProducts.length },
+          { icon:'✅', label:'上架中商品', value: adminProducts.filter(p => p.status==='上架中').length },
+          { icon:'🛒', label:'訂單總數', value: adminOrders.length },
+          { icon:'💰', label:'總營收', value: `NT$ ${totalRevenue.toLocaleString()}` },
         ].map((s,i) => (
           <div key={i} style={S.statCard}>
             <div style={S.statIcon}>{s.icon}</div>
@@ -1334,21 +1326,21 @@ export default function App() {
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:20 }}>
         <div style={S.adminCard}>
-          <div style={S.adminCardTitle}>æè¿ 10 ç­è¨å®</div>
+          <div style={S.adminCardTitle}>最近 10 筆訂單</div>
           {adminOrders.length === 0 ? (
-            <div style={{ color:C.textLight, fontSize:14 }}>æ«ç¡è¨å®</div>
+            <div style={{ color:C.textLight, fontSize:14 }}>暫無訂單</div>
           ) : (
             <div style={{ overflowX:'auto' }}>
               <table style={S.adminTable}>
                 <thead><tr>
-                  {['è¨å®ç·¨è','å®¢æ¶åç¨±','éé¡','çæ','æé'].map(h => <th key={h} style={S.adminTh}>{h}</th>)}
+                  {['訂單編號','客戶名稱','金額','狀態','時間'].map(h => <th key={h} style={S.adminTh}>{h}</th>)}
                 </tr></thead>
                 <tbody>{adminOrders.slice(0,10).map((o,i) => (
                   <tr key={o.id}>
                     <td style={adminTd(i%2===1)}>{o.order_number}</td>
                     <td style={adminTd(i%2===1)}>{o.customer_name}</td>
                     <td style={adminTd(i%2===1)}>NT$ {o.total_amount?.toLocaleString()}</td>
-                    <td style={adminTd(i%2===1)}><span style={orderStatusStyle(o.status||'å¾ç¢ºèª')}>{o.status||'å¾ç¢ºèª'}</span></td>
+                    <td style={adminTd(i%2===1)}><span style={orderStatusStyle(o.status||'待確認')}>{o.status||'待確認'}</span></td>
                     <td style={adminTd(i%2===1)}>{formatDate(o.created_at)}</td>
                   </tr>
                 ))}</tbody>
@@ -1357,15 +1349,15 @@ export default function App() {
           )}
         </div>
         <div style={S.adminCard}>
-          <div style={S.adminCardTitle}>è¨å®çæåä½</div>
+          <div style={S.adminCardTitle}>訂單狀態分佈</div>
           {ORDER_STATUSES.map(s => {
             const count = statusDist[s] || 0;
             const pct = adminOrders.length > 0 ? Math.round(count/adminOrders.length*100) : 0;
-            const clr = { 'å¾ç¢ºèª':'#f97316','å·²ç¢ºèª':'#3b82f6','å·²å®æ':'#16a34a','å·²åæ¶':'#ef4444' }[s];
+            const clr = { '待確認':'#f97316','已確認':'#3b82f6','已完成':'#16a34a','已取消':'#ef4444' }[s];
             return (
               <div key={s} style={{ marginBottom:16 }}>
                 <div style={{ display:'flex', justifyContent:'space-between', fontSize:13, marginBottom:6 }}>
-                  <span>{s}</span><span style={{ fontWeight:600, color:clr }}>{count} ç­</span>
+                  <span>{s}</span><span style={{ fontWeight:600, color:clr }}>{count} 筆</span>
                 </div>
                 <div style={{ background:'#e2e8f0', borderRadius:4, height:8, overflow:'hidden' }}>
                   <div style={{ width:`${pct}%`, background:clr, height:'100%', borderRadius:4, transition:'width .3s', minWidth: count > 0 ? 4 : 0 }} />
@@ -1378,9 +1370,9 @@ export default function App() {
     </div>
   );
 
-  // ââ Banner upload helper ââ
+  // ── Banner upload helper ──
   async function uploadBannerImage(file) {
-    if (file.size > 5 * 1024 * 1024) { setBannerUploadErr('æªæ¡ä¸å¾è¶é 5MB'); return; }
+    if (file.size > 5 * 1024 * 1024) { setBannerUploadErr('檔案不得超過 5MB'); return; }
     setUploadingBanner(true); setBannerUploadErr('');
     try {
       const fileName = `banner-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
@@ -1389,21 +1381,21 @@ export default function App() {
         headers: { 'apikey':SUPABASE_KEY, 'Authorization':`Bearer ${SUPABASE_KEY}` },
         body: file
       });
-      if (!res.ok) { const e = await res.json(); throw new Error(e.message || 'ä¸å³å¤±æ'); }
+      if (!res.ok) { const e = await res.json(); throw new Error(e.message || '上傳失敗'); }
       const url = `${SUPABASE_URL}/storage/v1/object/public/product-images/${fileName}`;
       setBannerForm(f => ({ ...f, image_url: url }));
-    } catch (e) { setBannerUploadErr('ä¸å³å¤±æï¼' + e.message); }
+    } catch (e) { setBannerUploadErr('上傳失敗：' + e.message); }
     finally { setUploadingBanner(false); }
   }
 
   const renderAdminBanners = () => (
     <div>
       <div style={S.toolbar}>
-        <button style={S.addProductBtn} onClick={() => { setBannerForm({ title:'', subtitle:'', cta_label:'', cta_category:'', image_url:'' }); setBannerUploadErr(''); setBannerModal('new'); }}>ï¼ æ°å¢æ©«å¹</button>
-        <button style={iconBtn()} onClick={() => { setBannerSlides(DEFAULT_BANNERS); setBannerIdx(0); }}>â© éåé è¨­</button>
+        <button style={S.addProductBtn} onClick={() => { setBannerForm({ title:'', subtitle:'', cta_label:'', cta_category:'', image_url:'' }); setBannerUploadErr(''); setBannerModal('new'); }}>＋ 新增橫幅</button>
+        <button style={iconBtn()} onClick={() => { setBannerSlides(DEFAULT_BANNERS); setBannerIdx(0); }}>↩ 還原預設</button>
       </div>
       {bannerSlides.length === 0 ? (
-        <div style={S.empty}>ç®åæ²ææ©«å¹ï¼é»æãæ°å¢æ©«å¹ãéå§è¨­å®</div>
+        <div style={S.empty}>目前沒有橫幅，點擊「新增橫幅」開始設定</div>
       ) : (
         <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
           {bannerSlides.map((slide, idx) => (
@@ -1412,20 +1404,20 @@ export default function App() {
               <div style={{ width:120, height:68, flexShrink:0, background:'#111', overflow:'hidden', borderRadius:0, display:'flex', alignItems:'center', justifyContent:'center', position:'relative' }}>
                 {slide.image_url
                   ? <img src={slide.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                  : <span style={{ color:'#555', fontSize:11 }}>ç¡åç</span>}
+                  : <span style={{ color:'#555', fontSize:11 }}>無圖片</span>}
               </div>
               {/* Info */}
               <div style={{ flex:1, minWidth:0 }}>
-                <div style={{ fontWeight:700, fontSize:14, marginBottom:2, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{slide.title || 'ï¼ç¡æ¨é¡ï¼'}</div>
+                <div style={{ fontWeight:700, fontSize:14, marginBottom:2, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{slide.title || '（無標題）'}</div>
                 <div style={{ fontSize:12, color:C.textLight, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{slide.subtitle}</div>
-                {slide.cta_label && <div style={{ fontSize:11, color:C.textLight, marginTop:2 }}>CTAï¼{slide.cta_label}{slide.cta_category ? ` â ${slide.cta_category}` : ''}</div>}
+                {slide.cta_label && <div style={{ fontSize:11, color:C.textLight, marginTop:2 }}>CTA：{slide.cta_label}{slide.cta_category ? ` → ${slide.cta_category}` : ''}</div>}
               </div>
               {/* Order controls */}
               <div style={{ display:'flex', gap:4, flexShrink:0 }}>
-                <button style={iconBtn()} disabled={idx===0} onClick={() => setBannerSlides(prev => { const a=[...prev]; [a[idx-1],a[idx]]=[a[idx],a[idx-1]]; return a; })}>â</button>
-                <button style={iconBtn()} disabled={idx===bannerSlides.length-1} onClick={() => setBannerSlides(prev => { const a=[...prev]; [a[idx],a[idx+1]]=[a[idx+1],a[idx]]; return a; })}>â</button>
-                <button style={iconBtn()} onClick={() => { setBannerForm({ ...slide }); setBannerUploadErr(''); setBannerModal(slide); }}>âï¸ ç·¨è¼¯</button>
-                <button style={S.dangerIconBtn} onClick={() => { if(window.confirm('ç¢ºå®è¦åªé¤æ­¤æ©«å¹ï¼')) setBannerSlides(prev => prev.filter(s => s.id !== slide.id)); }}>ð åªé¤</button>
+                <button style={iconBtn()} disabled={idx===0} onClick={() => setBannerSlides(prev => { const a=[...prev]; [a[idx-1],a[idx]]=[a[idx],a[idx-1]]; return a; })}>↑</button>
+                <button style={iconBtn()} disabled={idx===bannerSlides.length-1} onClick={() => setBannerSlides(prev => { const a=[...prev]; [a[idx],a[idx+1]]=[a[idx+1],a[idx]]; return a; })}>↓</button>
+                <button style={iconBtn()} onClick={() => { setBannerForm({ ...slide }); setBannerUploadErr(''); setBannerModal(slide); }}>✏️ 編輯</button>
+                <button style={S.dangerIconBtn} onClick={() => { if(window.confirm('確定要刪除此橫幅？')) setBannerSlides(prev => prev.filter(s => s.id !== slide.id)); }}>🗑 刪除</button>
               </div>
             </div>
           ))}
@@ -1436,24 +1428,24 @@ export default function App() {
       {bannerModal && (
         <div style={S.modal} onClick={e => e.target === e.currentTarget && setBannerModal(null)}>
           <div style={{ ...S.modalBox, maxWidth:560 }}>
-            <h3 style={S.modalTitle}>{bannerModal === 'new' ? 'æ°å¢æ©«å¹' : 'ç·¨è¼¯æ©«å¹'}</h3>
+            <h3 style={S.modalTitle}>{bannerModal === 'new' ? '新增橫幅' : '編輯橫幅'}</h3>
 
             {/* Image preview */}
             <div style={{ marginBottom:16 }}>
-              <label style={S.label}>æ©«å¹åç</label>
+              <label style={S.label}>橫幅圖片</label>
               {bannerForm.image_url && (
                 <div style={{ marginBottom:10, borderRadius:0, overflow:'hidden', height:140, background:'#111', position:'relative' }}>
                   <img src={bannerForm.image_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                  <button onClick={() => setBannerForm(f => ({ ...f, image_url:'' }))} style={{ position:'absolute', top:8, right:8, background:'rgba(0,0,0,.6)', border:'none', color:'#fff', borderRadius:0, padding:'4px 8px', cursor:'pointer', fontSize:12 }}>â ç§»é¤</button>
+                  <button onClick={() => setBannerForm(f => ({ ...f, image_url:'' }))} style={{ position:'absolute', top:8, right:8, background:'rgba(0,0,0,.6)', border:'none', color:'#fff', borderRadius:0, padding:'4px 8px', cursor:'pointer', fontSize:12 }}>✕ 移除</button>
                 </div>
               )}
               <div style={{ display:'flex', gap:8, alignItems:'center', flexWrap:'wrap' }}>
                 <label style={{ padding:'8px 14px', background:C.text, color:'#fff', cursor:'pointer', fontSize:12, fontWeight:600, letterSpacing:'0.05em', flexShrink:0 }}>
-                  {uploadingBanner ? 'ä¸å³ä¸­...' : 'ð ä¸å³åç'}
+                  {uploadingBanner ? '上傳中...' : '📁 上傳圖片'}
                   <input type="file" accept="image/*" style={{ display:'none' }} disabled={uploadingBanner}
                     onChange={e => e.target.files[0] && uploadBannerImage(e.target.files[0])} />
                 </label>
-                <span style={{ fontSize:11, color:C.textLight }}>æè¼¸å¥åçç¶²å</span>
+                <span style={{ fontSize:11, color:C.textLight }}>或輸入圖片網址</span>
               </div>
               <input style={{ ...S.input, marginTop:8 }} placeholder="https://..." value={bannerForm.image_url}
                 onChange={e => setBannerForm(f => ({ ...f, image_url: e.target.value }))} />
@@ -1461,38 +1453,38 @@ export default function App() {
             </div>
 
             <div style={S.formGroup}>
-              <label style={S.label}>æ¨é¡ï¼æ¯æ´æè¡ \nï¼</label>
+              <label style={S.label}>標題（支援換行 \n）</label>
               <input style={S.input} value={bannerForm.title} onChange={e => setBannerForm(f => ({ ...f, title: e.target.value }))} placeholder="Your Sound, Your Stage." />
             </div>
             <div style={S.formGroup}>
-              <label style={S.label}>å¯æ¨é¡</label>
-              <textarea style={S.textarea} value={bannerForm.subtitle} onChange={e => setBannerForm(f => ({ ...f, subtitle: e.target.value }))} placeholder="åä»ãè²æ¯ãéµç¤ãé¼çµååå¼éä»¶ï¼ä¸ç«è³¼è¶³" rows={2} />
+              <label style={S.label}>副標題</label>
+              <textarea style={S.textarea} value={bannerForm.subtitle} onChange={e => setBannerForm(f => ({ ...f, subtitle: e.target.value }))} placeholder="吉他、貝斯、鍵盤、鼓組及各式配件，一站購足" rows={2} />
             </div>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
               <div style={S.formGroup}>
-                <label style={S.label}>æéæå­</label>
+                <label style={S.label}>按鈕文字</label>
                 <input style={S.input} value={bannerForm.cta_label} onChange={e => setBannerForm(f => ({ ...f, cta_label: e.target.value }))} placeholder="SHOP NOW" />
               </div>
               <div style={S.formGroup}>
-                <label style={S.label}>é»æè·³å¾åé¡ï¼çç©º=çè¦½å¨é¨ï¼</label>
+                <label style={S.label}>點擊跳往分類（留空=瀏覽全部）</label>
                 <select style={S.select} value={bannerForm.cta_category} onChange={e => setBannerForm(f => ({ ...f, cta_category: e.target.value }))}>
-                  <option value="">çè¦½å¨é¨</option>
+                  <option value="">瀏覽全部</option>
                   {PROD_CATS.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
             </div>
 
             <div style={S.modalActions}>
-              <button style={S.cancelBtn} onClick={() => setBannerModal(null)}>åæ¶</button>
+              <button style={S.cancelBtn} onClick={() => setBannerModal(null)}>取消</button>
               <button style={S.confirmBtn} onClick={() => {
-                if (!bannerForm.title.trim() && !bannerForm.image_url) { alert('è«è¼¸å¥æ¨é¡æä¸å³åç'); return; }
+                if (!bannerForm.title.trim() && !bannerForm.image_url) { alert('請輸入標題或上傳圖片'); return; }
                 if (bannerModal === 'new') {
                   setBannerSlides(prev => [...prev, { ...bannerForm, id:'b'+Date.now() }]);
                 } else {
                   setBannerSlides(prev => prev.map(s => s.id === bannerModal.id ? { ...bannerForm, id:s.id } : s));
                 }
                 setBannerModal(null);
-              }}>å²å­</button>
+              }}>儲存</button>
             </div>
           </div>
         </div>
@@ -1503,39 +1495,39 @@ export default function App() {
   const renderAdminProducts = () => (
     <div>
       <div style={S.toolbar}>
-        <button style={S.addProductBtn} onClick={openNewProduct}>ï¼ æ°å¢åå</button>
-        <input style={S.searchInput} placeholder="æå°åååç¨±..." value={productSearch} onChange={e => setProductSearch(e.target.value)} />
+        <button style={S.addProductBtn} onClick={openNewProduct}>＋ 新增商品</button>
+        <input style={S.searchInput} placeholder="搜尋商品名稱..." value={productSearch} onChange={e => setProductSearch(e.target.value)} />
         <select style={S.select} value={productStatusFilter} onChange={e => setProductStatusFilter(e.target.value)}>
-          <option value="å¨é¨">å¨é¨çæ</option>
-          <option value="ä¸æ¶ä¸­">ä¸æ¶ä¸­</option>
-          <option value="å·²ä¸æ¶">å·²ä¸æ¶</option>
+          <option value="全部">全部狀態</option>
+          <option value="上架中">上架中</option>
+          <option value="已下架">已下架</option>
         </select>
-        <button style={iconBtn()} onClick={loadAdminProducts}>ð éæ°æ´ç</button>
+        <button style={iconBtn()} onClick={loadAdminProducts}>🔄 重新整理</button>
       </div>
       <div style={S.adminCard}>
         {filteredAdminProducts.length === 0 ? (
-          <div style={{ color:C.textLight, fontSize:14, padding:20 }}>æ²æç¬¦åæ¢ä»¶çåå</div>
+          <div style={{ color:C.textLight, fontSize:14, padding:20 }}>沒有符合條件的商品</div>
         ) : (
           <div style={{ overflowX:'auto' }}>
             <table style={S.adminTable}>
               <thead><tr>
-                {['åååç¨±','åç','è²¨è','å¹æ ¼','é¡å¥','çæ','æä½'].map(h => <th key={h} style={S.adminTh}>{h}</th>)}
+                {['商品名稱','品牌','貨號','價格','類別','狀態','操作'].map(h => <th key={h} style={S.adminTh}>{h}</th>)}
               </tr></thead>
               <tbody>{filteredAdminProducts.map((p,i) => (
                 <tr key={p.id}>
                   <td style={adminTd(i%2===1)}><strong>{p.name}</strong></td>
-                  <td style={adminTd(i%2===1)}>{p.brands?.name || 'â'}</td>
-                  <td style={adminTd(i%2===1)}>{p.sku || 'â'}</td>
-                  <td style={adminTd(i%2===1)}>{p.price > 0 ? `NT$ ${p.price.toLocaleString()}` : 'æ´½è©¢'}</td>
-                  <td style={adminTd(i%2===1)}>{p.category || 'â'}</td>
+                  <td style={adminTd(i%2===1)}>{p.brands?.name || '—'}</td>
+                  <td style={adminTd(i%2===1)}>{p.sku || '—'}</td>
+                  <td style={adminTd(i%2===1)}>{p.price > 0 ? `NT$ ${p.price.toLocaleString()}` : '洽詢'}</td>
+                  <td style={adminTd(i%2===1)}>{p.category || '—'}</td>
                   <td style={adminTd(i%2===1)}><span style={productStatusStyle(p.status)}>{p.status}</span></td>
                   <td style={adminTd(i%2===1)}>
                     <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
-                      <button style={iconBtn()} onClick={() => openEditProduct(p)}>âï¸ ç·¨è¼¯</button>
-                      <button style={iconBtn(p.status==='ä¸æ¶ä¸­' ? '#f97316' : '#16a34a')} onClick={() => handleToggleStatus(p)}>
-                        {p.status==='ä¸æ¶ä¸­' ? 'ð¤ ä¸æ¶' : 'ð¥ ä¸æ¶'}
+                      <button style={iconBtn()} onClick={() => openEditProduct(p)}>✏️ 編輯</button>
+                      <button style={iconBtn(p.status==='上架中' ? '#f97316' : '#16a34a')} onClick={() => handleToggleStatus(p)}>
+                        {p.status==='上架中' ? '📤 下架' : '📥 上架'}
                       </button>
-                      <button style={S.dangerIconBtn} onClick={() => setDeleteConfirm(p)}>ð åªé¤</button>
+                      <button style={S.dangerIconBtn} onClick={() => setDeleteConfirm(p)}>🗑 刪除</button>
                     </div>
                   </td>
                 </tr>
@@ -1550,38 +1542,38 @@ export default function App() {
   const renderAdminOrders = () => (
     <div>
       <div style={S.toolbar}>
-        <input style={S.searchInput} placeholder="æå°è¨å®ç·¨èæå®¢æ¶åç¨±..." value={orderSearch} onChange={e => setOrderSearch(e.target.value)} />
+        <input style={S.searchInput} placeholder="搜尋訂單編號或客戶名稱..." value={orderSearch} onChange={e => setOrderSearch(e.target.value)} />
         <select style={S.select} value={orderStatusFilter} onChange={e => setOrderStatusFilter(e.target.value)}>
-          <option value="å¨é¨">å¨é¨çæ</option>
+          <option value="全部">全部狀態</option>
           {ORDER_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
-        <button style={iconBtn()} onClick={loadAdminOrders}>ð éæ°æ´ç</button>
+        <button style={iconBtn()} onClick={loadAdminOrders}>🔄 重新整理</button>
       </div>
       <div style={S.adminCard}>
         {filteredAdminOrders.length === 0 ? (
-          <div style={{ color:C.textLight, fontSize:14, padding:20 }}>æ²æç¬¦åæ¢ä»¶çè¨å®</div>
+          <div style={{ color:C.textLight, fontSize:14, padding:20 }}>沒有符合條件的訂單</div>
         ) : (
           <div style={{ overflowX:'auto' }}>
             <table style={S.adminTable}>
               <thead><tr>
-                {['è¨å®ç·¨è','å®¢æ¶åç¨±','è¯çµ¡æ¹å¼','ååæ¸','ç¸½éé¡','çæ','ä¸å®æé','æä½'].map(h => <th key={h} style={S.adminTh}>{h}</th>)}
+                {['訂單編號','客戶名稱','聯絡方式','商品數','總金額','狀態','下單時間','操作'].map(h => <th key={h} style={S.adminTh}>{h}</th>)}
               </tr></thead>
               <tbody>{filteredAdminOrders.map((o,i) => [
                 <tr key={o.id}>
                   <td style={adminTd(i%2===1)}>{o.order_number}</td>
                   <td style={adminTd(i%2===1)}>{o.customer_name}</td>
-                  <td style={adminTd(i%2===1)}>{o.contact || 'â'}</td>
-                  <td style={adminTd(i%2===1)}>{o.order_items?.length || 0} ä»¶</td>
+                  <td style={adminTd(i%2===1)}>{o.contact || '—'}</td>
+                  <td style={adminTd(i%2===1)}>{o.order_items?.length || 0} 件</td>
                   <td style={adminTd(i%2===1)}>NT$ {o.total_amount?.toLocaleString()}</td>
-                  <td style={adminTd(i%2===1)}><span style={orderStatusStyle(o.status||'å¾ç¢ºèª')}>{o.status||'å¾ç¢ºèª'}</span></td>
+                  <td style={adminTd(i%2===1)}><span style={orderStatusStyle(o.status||'待確認')}>{o.status||'待確認'}</span></td>
                   <td style={adminTd(i%2===1)}>{formatDate(o.created_at)}</td>
                   <td style={adminTd(i%2===1)}>
                     <div style={{ display:'flex', gap:6, alignItems:'center', flexWrap:'wrap' }}>
                       <button style={iconBtn()} onClick={() => setExpandedAdminOrder(expandedAdminOrder===o.id ? null : o.id)}>
-                        {expandedAdminOrder===o.id ? 'â² æ¶èµ·' : 'â¼ æç´°'}
+                        {expandedAdminOrder===o.id ? '▲ 收起' : '▼ 明細'}
                       </button>
-                      <button style={{ padding:'4px 10px', background:'none', border:`1px solid ${C.primary}`, color:C.primary, borderRadius:6, cursor:'pointer', fontSize:12 }} onClick={() => openEditOrder(o)}>âï¸ ç·¨è¼¯</button>
-                      <button style={{ padding:'4px 10px', background:'none', border:`1px solid ${C.danger}`, color:C.danger, borderRadius:6, cursor:'pointer', fontSize:12 }} onClick={() => setOrderDeleteConfirm(o)}>ðï¸ åªé¤</button>
+                      <button style={{ padding:'4px 10px', background:'none', border:`1px solid ${C.primary}`, color:C.primary, borderRadius:6, cursor:'pointer', fontSize:12 }} onClick={() => openEditOrder(o)}>✏️ 編輯</button>
+                      <button style={{ padding:'4px 10px', background:'none', border:`1px solid ${C.danger}`, color:C.danger, borderRadius:6, cursor:'pointer', fontSize:12 }} onClick={() => setOrderDeleteConfirm(o)}>🗑️ 刪除</button>
                     </div>
                   </td>
                 </tr>,
@@ -1591,7 +1583,7 @@ export default function App() {
                       <div style={{ paddingTop:12 }}>
                         <table style={{ ...S.adminTable, marginBottom:8 }}>
                           <thead><tr>
-                            {['åååç¨±','æ¸é','å®å¹','å°è¨'].map(h => <th key={h} style={{ ...S.adminTh, background:'#e2e8f0' }}>{h}</th>)}
+                            {['商品名稱','數量','單價','小計'].map(h => <th key={h} style={{ ...S.adminTh, background:'#e2e8f0' }}>{h}</th>)}
                           </tr></thead>
                           <tbody>{(o.order_items||[]).map((item,j) => (
                             <tr key={j}>
@@ -1602,7 +1594,7 @@ export default function App() {
                             </tr>
                           ))}</tbody>
                         </table>
-                        {o.notes && <div style={{ fontSize:13, color:C.textLight }}>åè¨»ï¼{o.notes}</div>}
+                        {o.notes && <div style={{ fontSize:13, color:C.textLight }}>備註：{o.notes}</div>}
                       </div>
                     </td>
                   </tr>
@@ -1618,51 +1610,51 @@ export default function App() {
   const renderProductModal = () => productModal && (
     <div style={S.modal} onClick={e => e.target===e.currentTarget && setProductModal(null)}>
       <div style={{ ...S.modalBox, maxWidth:560 }}>
-        <h2 style={S.modalTitle}>{productModal==='new' ? 'æ°å¢åå' : 'ç·¨è¼¯åå'}</h2>
+        <h2 style={S.modalTitle}>{productModal==='new' ? '新增商品' : '編輯商品'}</h2>
         <div style={S.formGroup}>
-          <label style={S.label}>åååç¨± *</label>
-          <input style={productFormErrors.name ? S.inputError : S.input} value={productForm.name} onChange={e => setProductForm(f => ({ ...f, name:e.target.value }))} placeholder="è«è¼¸å¥åååç¨±" />
+          <label style={S.label}>商品名稱 *</label>
+          <input style={productFormErrors.name ? S.inputError : S.input} value={productForm.name} onChange={e => setProductForm(f => ({ ...f, name:e.target.value }))} placeholder="請輸入商品名稱" />
           {productFormErrors.name && <div style={S.errorText}>{productFormErrors.name}</div>}
         </div>
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
           <div style={S.formGroup}>
-            <label style={S.label}>åç</label>
+            <label style={S.label}>品牌</label>
             <select style={{ ...S.input, cursor:'pointer' }} value={productForm.brand_id}
               onChange={e => { if (e.target.value === '__new__') { setBrandModal(true); } else { setProductForm(f => ({ ...f, brand_id:e.target.value })); } }}>
-              <option value="">ç¡åç</option>
+              <option value="">無品牌</option>
               {adminBrands.map(b => <option key={b.id} value={String(b.id)}>{b.name}</option>)}
-              <option value="__new__">ï¼ æ°å¢åç...</option>
+              <option value="__new__">＋ 新增品牌...</option>
             </select>
           </div>
           <div style={S.formGroup}>
-            <label style={S.label}>è²¨è</label>
-            <input style={S.input} value={productForm.sku} onChange={e => setProductForm(f => ({ ...f, sku:e.target.value }))} placeholder="é¸å¡«" />
+            <label style={S.label}>貨號</label>
+            <input style={S.input} value={productForm.sku} onChange={e => setProductForm(f => ({ ...f, sku:e.target.value }))} placeholder="選填" />
           </div>
           <div style={S.formGroup}>
-            <label style={S.label}>å¹æ ¼ï¼0 = æ´½è©¢ï¼</label>
+            <label style={S.label}>價格（0 = 洽詢）</label>
             <input style={S.input} type="number" min="0" value={productForm.price} onChange={e => setProductForm(f => ({ ...f, price:e.target.value }))} />
           </div>
           <div style={S.formGroup}>
-            <label style={S.label}>é¡å¥</label>
+            <label style={S.label}>類別</label>
             <select style={{ ...S.input, cursor:'pointer' }} value={productForm.category} onChange={e => setProductForm(f => ({ ...f, category:e.target.value }))}>
               {PROD_CATS.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
         </div>
         <div style={S.formGroup}>
-          <label style={S.label}>çæ</label>
+          <label style={S.label}>狀態</label>
           <select style={{ ...S.input, cursor:'pointer' }} value={productForm.status} onChange={e => setProductForm(f => ({ ...f, status:e.target.value }))}>
-            <option value="ä¸æ¶ä¸­">ä¸æ¶ä¸­</option>
-            <option value="å·²ä¸æ¶">å·²ä¸æ¶</option>
+            <option value="上架中">上架中</option>
+            <option value="已下架">已下架</option>
           </select>
         </div>
         <div style={S.formGroup}>
-          <label style={S.label}>åååçï¼é¸å¡«ï¼</label>
+          <label style={S.label}>商品圖片（選填）</label>
           {productForm.image_url ? (
             <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:10 }}>
               <img
                 src={productForm.image_url}
-                alt="é è¦½"
+                alt="預覽"
                 style={{ width:100, height:100, objectFit:'cover', borderRadius:8, border:`1px solid ${C.border}`, flexShrink:0 }}
                 onError={e => { e.target.style.display='none'; }}
               />
@@ -1670,14 +1662,14 @@ export default function App() {
                 type="button"
                 style={{ padding:'6px 12px', background:'none', border:`1px solid ${C.danger}`, color:C.danger, borderRadius:6, cursor:'pointer', fontSize:12 }}
                 onClick={() => { setProductForm(f => ({ ...f, image_url:'' })); setUploadError(''); }}
-              >â æ¸é¤åç</button>
+              >✕ 清除圖片</button>
             </div>
           ) : null}
           <input
             style={{ ...S.input, marginBottom:8 }}
             value={productForm.image_url}
             onChange={e => setProductForm(f => ({ ...f, image_url:e.target.value }))}
-            placeholder="è²¼ä¸åçé£çµï¼æé»ä¸æ¹æéä¸å³"
+            placeholder="貼上圖片連結，或點下方按鈕上傳"
           />
           <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
             <input
@@ -1698,25 +1690,25 @@ export default function App() {
               style={{ padding:'8px 16px', background: uploadingImage ? '#e2e8f0' : '#f1f5f9', border:`1px solid ${C.border}`, borderRadius:8, cursor: uploadingImage ? 'not-allowed' : 'pointer', fontSize:13, display:'flex', alignItems:'center', gap:6, color: uploadingImage ? C.textLight : C.text }}
               onClick={() => document.getElementById('img-upload-input').click()}
             >
-              {uploadingImage ? 'â³ ä¸å³ä¸­...' : 'ð é¸æåçä¸å³'}
+              {uploadingImage ? '⏳ 上傳中...' : '📁 選擇圖片上傳'}
             </button>
-            <span style={{ fontSize:12, color:C.textLight }}>åæ¥ååçæ ¼å¼ï¼ä¸é 5MB</span>
+            <span style={{ fontSize:12, color:C.textLight }}>僅接受圖片格式，上限 5MB</span>
           </div>
           {uploadError && <div style={{ ...S.errorText, marginTop:6 }}>{uploadError}</div>}
         </div>
         <div style={S.formGroup}>
-          <label style={S.label}>ååæè¿°ï¼é¸å¡«ï¼</label>
+          <label style={S.label}>商品描述（選填）</label>
           <textarea
             style={{ ...S.textarea, minHeight:140 }}
             value={productForm.description}
             onChange={e => setProductForm(f => ({ ...f, description:e.target.value }))}
             rows={8}
-            placeholder={'ååä»ç´¹èè¦æ ¼èªªæ\nä¾å¦ï¼\nMooer GE200 æ¯ä¸æ¬¾å¤åè½ç¶åææå¨...\n\nè¦æ ¼ï¼\n- æææ¸éï¼55 ç¨®\n- å°ºå¯¸ï¼225 x 120 x 48 mm\n- ééï¼780g\n- é»æºï¼9V DC'}
+            placeholder={'商品介紹與規格說明\n例如：\nMooer GE200 是一款多功能綜合效果器...\n\n規格：\n- 效果數量：55 種\n- 尺寸：225 x 120 x 48 mm\n- 重量：780g\n- 電源：9V DC'}
           />
         </div>
         <div style={S.modalActions}>
-          <button style={S.cancelBtn} onClick={() => setProductModal(null)}>åæ¶</button>
-          <button style={savingProduct ? S.disabledBtn : S.confirmBtn} disabled={savingProduct} onClick={handleSaveProduct}>{savingProduct ? 'å²å­ä¸­...' : 'å²å­'}</button>
+          <button style={S.cancelBtn} onClick={() => setProductModal(null)}>取消</button>
+          <button style={savingProduct ? S.disabledBtn : S.confirmBtn} disabled={savingProduct} onClick={handleSaveProduct}>{savingProduct ? '儲存中...' : '儲存'}</button>
         </div>
       </div>
     </div>
@@ -1725,12 +1717,12 @@ export default function App() {
   const renderDeleteConfirm = () => deleteConfirm && (
     <div style={S.modal} onClick={e => e.target===e.currentTarget && setDeleteConfirm(null)}>
       <div style={{ ...S.modalBox, maxWidth:400 }}>
-        <div style={{ fontSize:40, textAlign:'center', marginBottom:12 }}>ðï¸</div>
-        <h2 style={{ ...S.modalTitle, textAlign:'center' }}>ç¢ºå®è¦åªé¤æ­¤åååï¼</h2>
-        <p style={{ color:C.textLight, textAlign:'center', marginBottom:24 }}>ã{deleteConfirm.name}ãå°è¢«æ°¸ä¹åªé¤ï¼æ­¤æä½ç¡æ³å¾©åã</p>
+        <div style={{ fontSize:40, textAlign:'center', marginBottom:12 }}>🗑️</div>
+        <h2 style={{ ...S.modalTitle, textAlign:'center' }}>確定要刪除此商品嗎？</h2>
+        <p style={{ color:C.textLight, textAlign:'center', marginBottom:24 }}>「{deleteConfirm.name}」將被永久刪除，此操作無法復原。</p>
         <div style={S.modalActions}>
-          <button style={S.cancelBtn} onClick={() => setDeleteConfirm(null)}>åæ¶</button>
-          <button style={{ ...S.confirmBtn, background:C.danger }} onClick={() => handleDeleteProduct(deleteConfirm.id)}>ç¢ºèªåªé¤</button>
+          <button style={S.cancelBtn} onClick={() => setDeleteConfirm(null)}>取消</button>
+          <button style={{ ...S.confirmBtn, background:C.danger }} onClick={() => handleDeleteProduct(deleteConfirm.id)}>確認刪除</button>
         </div>
       </div>
     </div>
@@ -1739,21 +1731,21 @@ export default function App() {
   const renderBrandModal = () => brandModal && (
     <div style={{ ...S.modal, zIndex:400 }} onClick={e => e.target===e.currentTarget && setBrandModal(false)}>
       <div style={{ ...S.modalBox, maxWidth:360 }}>
-        <h2 style={S.modalTitle}>æ°å¢åç</h2>
+        <h2 style={S.modalTitle}>新增品牌</h2>
         <div style={S.formGroup}>
-          <label style={S.label}>åçåç¨±</label>
+          <label style={S.label}>品牌名稱</label>
           <input
             style={S.input}
             value={newBrandName}
             onChange={e => setNewBrandName(e.target.value)}
-            placeholder="è«è¼¸å¥åçåç¨±"
+            placeholder="請輸入品牌名稱"
             onKeyDown={e => e.key==='Enter' && handleAddBrand()}
             autoFocus
           />
         </div>
         <div style={S.modalActions}>
-          <button style={S.cancelBtn} onClick={() => { setBrandModal(false); setNewBrandName(''); }}>åæ¶</button>
-          <button style={addingBrand ? S.disabledBtn : S.confirmBtn} disabled={addingBrand} onClick={handleAddBrand}>{addingBrand ? 'æ°å¢ä¸­...' : 'æ°å¢'}</button>
+          <button style={S.cancelBtn} onClick={() => { setBrandModal(false); setNewBrandName(''); }}>取消</button>
+          <button style={addingBrand ? S.disabledBtn : S.confirmBtn} disabled={addingBrand} onClick={handleAddBrand}>{addingBrand ? '新增中...' : '新增'}</button>
         </div>
       </div>
     </div>
@@ -1762,15 +1754,15 @@ export default function App() {
   const renderOrderDeleteConfirm = () => orderDeleteConfirm && (
     <div style={S.modal} onClick={e => e.target === e.currentTarget && setOrderDeleteConfirm(null)}>
       <div style={{ ...S.modalBox, maxWidth:400 }}>
-        <h2 style={S.modalTitle}>ç¢ºèªåªé¤è¨å®</h2>
+        <h2 style={S.modalTitle}>確認刪除訂單</h2>
         <p style={{ fontSize:15, color:C.text, marginBottom:8 }}>
-          ç¢ºå®è¦åªé¤è¨å® <strong>{orderDeleteConfirm.order_number}</strong> åï¼
+          確定要刪除訂單 <strong>{orderDeleteConfirm.order_number}</strong> 嗎？
         </p>
-        <p style={{ fontSize:13, color:C.danger, marginBottom:24 }}>æ­¤æä½ç¡æ³å¾©åã</p>
+        <p style={{ fontSize:13, color:C.danger, marginBottom:24 }}>此操作無法復原。</p>
         <div style={S.modalActions}>
-          <button style={S.cancelBtn} onClick={() => setOrderDeleteConfirm(null)} disabled={deletingOrder}>åæ¶</button>
+          <button style={S.cancelBtn} onClick={() => setOrderDeleteConfirm(null)} disabled={deletingOrder}>取消</button>
           <button style={{ ...S.confirmBtn, background:C.danger }} onClick={handleDeleteOrder} disabled={deletingOrder}>
-            {deletingOrder ? 'åªé¤ä¸­...' : 'ç¢ºèªåªé¤'}
+            {deletingOrder ? '刪除中...' : '確認刪除'}
           </button>
         </div>
       </div>
@@ -1780,36 +1772,36 @@ export default function App() {
   const renderOrderEditModal = () => orderEditModal && (
     <div style={S.modal} onClick={e => e.target === e.currentTarget && !savingOrder && setOrderEditModal(null)}>
       <div style={{ ...S.modalBox, maxWidth:600 }}>
-        <h2 style={S.modalTitle}>ç·¨è¼¯è¨å® â {orderEditModal.order_number}</h2>
+        <h2 style={S.modalTitle}>編輯訂單 — {orderEditModal.order_number}</h2>
 
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
           <div style={S.formGroup}>
-            <label style={S.label}>å®¢æ¶åç¨±</label>
+            <label style={S.label}>客戶名稱</label>
             <input style={S.input} value={orderEditForm.customer_name} onChange={e => setOrderEditForm(f => ({ ...f, customer_name:e.target.value }))} />
           </div>
           <div style={S.formGroup}>
-            <label style={S.label}>è¯çµ¡æ¹å¼</label>
+            <label style={S.label}>聯絡方式</label>
             <input style={S.input} value={orderEditForm.contact} onChange={e => setOrderEditForm(f => ({ ...f, contact:e.target.value }))} />
           </div>
         </div>
 
         <div style={S.formGroup}>
-          <label style={S.label}>è¨å®çæ</label>
+          <label style={S.label}>訂單狀態</label>
           <select style={{ ...S.input, cursor:'pointer' }} value={orderEditForm.status} onChange={e => setOrderEditForm(f => ({ ...f, status:e.target.value }))}>
             {ORDER_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
 
         <div style={S.formGroup}>
-          <label style={S.label}>åè¨»</label>
+          <label style={S.label}>備註</label>
           <textarea style={S.textarea} value={orderEditForm.notes} onChange={e => setOrderEditForm(f => ({ ...f, notes:e.target.value }))} rows={2} />
         </div>
 
         <div style={{ marginBottom:16 }}>
-          <label style={{ ...S.label, marginBottom:8 }}>è¨å®æç´°</label>
+          <label style={{ ...S.label, marginBottom:8 }}>訂單明細</label>
           <table style={{ ...S.adminTable, marginBottom:4 }}>
             <thead><tr>
-              {['åååç¨±','å®å¹','æ¸é','å°è¨',''].map(h => <th key={h} style={{ ...S.adminTh, background:'#f1f5f9', padding:'8px 10px' }}>{h}</th>)}
+              {['商品名稱','單價','數量','小計',''].map(h => <th key={h} style={{ ...S.adminTh, background:'#f1f5f9', padding:'8px 10px' }}>{h}</th>)}
             </tr></thead>
             <tbody>{orderEditItems.map((item, idx) => (
               <tr key={item.id} style={item._deleted ? { opacity:0.4, textDecoration:'line-through' } : {}}>
@@ -1835,12 +1827,12 @@ export default function App() {
                   {!item._deleted ? (
                     <button style={{ background:'none', border:'none', color:C.danger, cursor:'pointer', fontSize:13 }}
                       onClick={() => setOrderEditItems(prev => prev.map((it,i) => i===idx ? { ...it, _deleted:true } : it))}>
-                      ðï¸
+                      🗑️
                     </button>
                   ) : (
                     <button style={{ background:'none', border:'none', color:C.primary, cursor:'pointer', fontSize:13 }}
                       onClick={() => setOrderEditItems(prev => prev.map((it,i) => i===idx ? { ...it, _deleted:false } : it))}>
-                      â©ï¸
+                      ↩️
                     </button>
                   )}
                 </td>
@@ -1848,16 +1840,16 @@ export default function App() {
             ))}</tbody>
           </table>
           <div style={{ textAlign:'right', fontWeight:700, fontSize:14, color:C.primary, marginTop:4 }}>
-            ç¸½éé¡ï¼NT$ {orderEditItems.filter(i => !i._deleted).reduce((s,i) => s + i._qty * i.unit_price, 0).toLocaleString()}
+            總金額：NT$ {orderEditItems.filter(i => !i._deleted).reduce((s,i) => s + i._qty * i.unit_price, 0).toLocaleString()}
           </div>
         </div>
 
         {orderSaveError && <div style={{ color:C.danger, fontSize:13, marginBottom:12 }}>{orderSaveError}</div>}
 
         <div style={S.modalActions}>
-          <button style={S.cancelBtn} onClick={() => setOrderEditModal(null)} disabled={savingOrder}>åæ¶</button>
+          <button style={S.cancelBtn} onClick={() => setOrderEditModal(null)} disabled={savingOrder}>取消</button>
           <button style={S.confirmBtn} onClick={handleSaveOrder} disabled={savingOrder}>
-            {savingOrder ? 'å²å­ä¸­...' : 'å²å­'}
+            {savingOrder ? '儲存中...' : '儲存'}
           </button>
         </div>
       </div>
@@ -1867,24 +1859,24 @@ export default function App() {
   const renderAdminLoginModal = () => adminLoginModal && (
     <div style={S.modal} onClick={e => e.target === e.currentTarget && (setAdminLoginModal(false), setAdminPasswordInput(''), setAdminPasswordError(false))}>
       <div style={{ ...S.modalBox, maxWidth:360 }}>
-        <h2 style={S.modalTitle}>ç®¡çå¾å°ç»å¥</h2>
+        <h2 style={S.modalTitle}>管理後台登入</h2>
         <div style={S.formGroup}>
           <input
             type="password"
             style={{ ...S.input, ...(adminPasswordError ? { border:`2px solid ${C.danger}` } : {}) }}
             value={adminPasswordInput}
             onChange={e => { setAdminPasswordInput(e.target.value); setAdminPasswordError(false); }}
-            placeholder="è«è¼¸å¥ç®¡çå¯ç¢¼"
+            placeholder="請輸入管理密碼"
             onKeyDown={e => e.key === 'Enter' && handleAdminLogin()}
             autoFocus
             onFocus={e => { e.target.style.border = `2px solid ${C.primary}`; e.target.style.outline = 'none'; }}
             onBlur={e => { e.target.style.border = adminPasswordError ? `2px solid ${C.danger}` : `1px solid ${C.border}`; }}
           />
-          {adminPasswordError && <div style={S.errorText}>å¯ç¢¼é¯èª¤</div>}
+          {adminPasswordError && <div style={S.errorText}>密碼錯誤</div>}
         </div>
         <div style={S.modalActions}>
-          <button style={S.cancelBtn} onClick={() => { setAdminLoginModal(false); setAdminPasswordInput(''); setAdminPasswordError(false); }}>åæ¶</button>
-          <button style={S.confirmBtn} onClick={handleAdminLogin}>ç»å¥</button>
+          <button style={S.cancelBtn} onClick={() => { setAdminLoginModal(false); setAdminPasswordInput(''); setAdminPasswordError(false); }}>取消</button>
+          <button style={S.confirmBtn} onClick={handleAdminLogin}>登入</button>
         </div>
       </div>
     </div>
@@ -1892,19 +1884,19 @@ export default function App() {
 
   const renderAdminLayout = () => {
     const navItems = [
-      { id:'dashboard',   icon:'ð', label:'Dashboard' },
-      { id:'products',    icon:'ð¦', label:'ååç®¡ç' },
-      { id:'adminorders', icon:'ð', label:'è¨å®ç®¡ç' },
-      { id:'banners',     icon:'ð¼', label:'æ©«å¹ç®¡ç' },
+      { id:'dashboard',   icon:'📊', label:'Dashboard' },
+      { id:'products',    icon:'📦', label:'商品管理' },
+      { id:'adminorders', icon:'🛒', label:'訂單管理' },
+      { id:'banners',     icon:'🖼', label:'橫幅管理' },
     ];
-    const titles = { dashboard:'Dashboard ç¸½è¦½', products:'ååç®¡ç', adminorders:'è¨å®ç®¡ç', banners:'æ©«å¹ç®¡ç' };
+    const titles = { dashboard:'Dashboard 總覽', products:'商品管理', adminorders:'訂單管理', banners:'橫幅管理' };
     return (
       <div style={S.adminLayout}>
         {/* Left sidebar */}
         <div style={S.adminSidebar} className="admin-sidebar-hide">
           <div style={S.adminSidebarHeader}>
-            <div style={S.adminSidebarTitle}>âï¸ AMC ç®¡çå¾å°</div>
-            <div style={S.adminSidebarSubtitle}>å®ç¿æ¨å¨å¾å°ç®¡çç³»çµ±</div>
+            <div style={S.adminSidebarTitle}>⚙️ AMC 管理後台</div>
+            <div style={S.adminSidebarSubtitle}>宏睿樂器後台管理系統</div>
           </div>
           <nav style={S.adminSidebarNav}>
             {navItems.map(item => (
@@ -1914,8 +1906,8 @@ export default function App() {
             ))}
           </nav>
           <div style={S.adminSidebarFooter}>
-            <button style={S.adminBackBtn} onClick={goShop}>â åå°åå°</button>
-            <button style={{ ...S.adminBackBtn, marginTop:10, color:'#94a3b8' }} onClick={handleAdminLogout}>ð ç»åº</button>
+            <button style={S.adminBackBtn} onClick={goShop}>← 回到前台</button>
+            <button style={{ ...S.adminBackBtn, marginTop:10, color:'#94a3b8' }} onClick={handleAdminLogout}>🔒 登出</button>
           </div>
         </div>
         {/* Right content */}
@@ -1926,8 +1918,8 @@ export default function App() {
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:12 }}>
               {adminLoading && <div style={{ ...S.spinner, width:22, height:22, borderWidth:3 }} />}
-              <button style={{ background:'none', border:`1px solid ${C.border}`, borderRadius:8, padding:'6px 14px', cursor:'pointer', fontSize:13 }} onClick={goShop}>â åå°åå°</button>
-              <button style={{ background:'none', border:`1px solid ${C.border}`, borderRadius:8, padding:'6px 14px', cursor:'pointer', fontSize:13, color:C.textLight }} onClick={handleAdminLogout}>ð ç»åº</button>
+              <button style={{ background:'none', border:`1px solid ${C.border}`, borderRadius:8, padding:'6px 14px', cursor:'pointer', fontSize:13 }} onClick={goShop}>← 回到前台</button>
+              <button style={{ background:'none', border:`1px solid ${C.border}`, borderRadius:8, padding:'6px 14px', cursor:'pointer', fontSize:13, color:C.textLight }} onClick={handleAdminLogout}>🔒 登出</button>
             </div>
           </div>
           {/* Mobile tab nav */}
@@ -1951,9 +1943,9 @@ export default function App() {
     );
   };
 
-  // âââââââââââââââââââââââââââââââââââââââââââââââââââ
+  // ═══════════════════════════════════════════════════
   // MAIN RENDER
-  // âââââââââââââââââââââââââââââââââââââââââââââââââââ
+  // ═══════════════════════════════════════════════════
   return (
     <div style={S.app}>
       {page === 'admin' && isAdminLoggedIn ? (
@@ -1972,10 +1964,10 @@ export default function App() {
           {page === 'shop' && selectedProductId && renderProductDetail()}
           {page === 'confirm' && renderConfirm()}
           {page === 'orders'  && renderOrders()}
-          {/* ââ Footer ââ */}
+          {/* ── Footer ── */}
           <footer style={{ borderTop:'1px solid #e5e5e5', background:'#f5f5f5', padding:'20px 32px', textAlign:'center' }} className="no-print">
             <p style={{ margin:0, fontSize:13, color:'#888', letterSpacing:'0.3px' }}>
-              å®ç¿æ¨å¨ Alliance Music Company &copy; {new Date().getFullYear()}
+              宏睿樂器 Alliance Music Company &copy; {new Date().getFullYear()}
             </p>
           </footer>
           {renderCart()}
