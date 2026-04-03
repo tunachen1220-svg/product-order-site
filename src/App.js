@@ -260,7 +260,7 @@ const S = {
   bannerDotActive: { width:22, height:7, borderRadius:4, background:'#fff', border:'none', cursor:'pointer', padding:0, transition:'all .3s', flexShrink:0 },
   // ── Shop sidebar ──
   shopWrapper: { display:'flex', borderTop:`1px solid ${C.border}` },
-  shopSidebar: { width:200, flexShrink:0, background:'#fff', borderRight:`1px solid ${C.border}`, position:'sticky', top:57, height:'calc(100vh - 57px)', overflowY:'auto' },
+  shopSidebar: { width:200, flexShrink:0, background:'#fff', borderRight:`1px solid ${C.border}`, position:'sticky', top:108, height:'calc(100vh - 108px)', overflowY:'auto' },
   shopSidebarLogo: { display:'flex', alignItems:'center', gap:8, padding:'18px 20px 14px', borderBottom:`1px solid ${C.border}`, cursor:'pointer', background:'none', border:'none', width:'100%', textAlign:'left' },
   shopSidebarSection: { padding:'16px 0 8px' },
   shopSidebarSectionTitle: { fontSize:10, fontWeight:700, letterSpacing:'0.14em', textTransform:'uppercase', color:C.textLight, padding:'0 20px', marginBottom:4 },
@@ -893,13 +893,7 @@ export default function App() {
         <aside style={S.shopSidebar} className="no-print shop-sidebar-hide">
           {/* Logo / Home */}
           <button style={S.shopSidebarLogo} onClick={goShop}>
-            <div style={{ width:28, height:28, background:'#1a3a5c', borderRadius:5, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-              <span style={{ color:'#fff', fontSize:10, fontWeight:700, letterSpacing:'0.5px' }}>AMC</span>
-            </div>
-            <div style={{ display:'flex', flexDirection:'column', lineHeight:1.2 }}>
-              <span style={{ fontSize:12, fontWeight:700, color:C.text }}>宏睿樂器</span>
-              <span style={{ fontSize:9, color:'#999' }}>所有商品</span>
-            </div>
+            <img src="/logo.png" alt="AMC 宏睿樂器" style={{height:'40px',objectFit:'contain',display:'block'}} />
           </button>
 
           {/* Categories */}
