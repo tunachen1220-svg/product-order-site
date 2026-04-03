@@ -90,7 +90,7 @@ function productStatusStyle(status) {
 const S = {
   app: { fontFamily:'"Inter","Noto Sans TC",-apple-system,BlinkMacSystemFont,sans-serif', color:C.text, background:C.bg, minHeight:'100vh' },
   // Nav
-  nav: { background:'#fff', borderBottom:'none', boxShadow:'0 1px 3px rgba(0,0,0,.10)', padding:'14px 32px', display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky', top:0, zIndex:100 },
+  nav: { background:'#fff', borderBottom:'none', boxShadow:'0 1px 3px rgba(0,0,0,.10)', padding:'12px 32px', display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky', top:0, zIndex:100 },
   navBrand: { display:'flex', alignItems:'center', gap:12, cursor:'pointer', userSelect:'none', textDecoration:'none' },
   navLogoMark: { width:42, height:42, background:'#1a3a5c', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 },
   navLogoText: { color:'#fff', fontSize:14, fontWeight:700, letterSpacing:'1px' },
@@ -260,7 +260,7 @@ const S = {
   bannerDotActive: { width:22, height:7, borderRadius:4, background:'#fff', border:'none', cursor:'pointer', padding:0, transition:'all .3s', flexShrink:0 },
   // ── Shop sidebar ──
   shopWrapper: { display:'flex', borderTop:`1px solid ${C.border}` },
-  shopSidebar: { width:200, flexShrink:0, background:'#fff', borderRight:`1px solid ${C.border}`, position:'sticky', top:108, height:'calc(100vh - 108px)', overflowY:'auto' },
+  shopSidebar: { width:200, flexShrink:0, background:'#fff', borderRight:`1px solid ${C.border}`, position:'sticky', top:80, height:'calc(100vh - 80px)', overflowY:'auto' },
   shopSidebarLogo: { display:'flex', alignItems:'center', gap:8, padding:'18px 20px 14px', borderBottom:`1px solid ${C.border}`, cursor:'pointer', background:'none', border:'none', width:'100%', textAlign:'left' },
   shopSidebarSection: { padding:'16px 0 8px' },
   shopSidebarSectionTitle: { fontSize:10, fontWeight:700, letterSpacing:'0.14em', textTransform:'uppercase', color:C.textLight, padding:'0 20px', marginBottom:4 },
@@ -763,7 +763,7 @@ export default function App() {
       {/* ── AMC Brand ── */}
       <div style={S.navBrand} onClick={goShop} role="button" tabIndex={0} title="回首頁"
         onKeyDown={e => e.key === 'Enter' && goShop()}>
-        <img src="/logo.png" alt="AMC 宏睿樂器" style={{height:'80px',objectFit:'contain'}} />
+        <img src="/logo.png" alt="AMC 宏睿樂器" style={{height:'56px',width:'auto',display:'block',flexShrink:0}} />
       </div>
 
       {/* ── Right nav ── */}
@@ -893,7 +893,7 @@ export default function App() {
         <aside style={S.shopSidebar} className="no-print shop-sidebar-hide">
           {/* Logo / Home */}
           <button style={S.shopSidebarLogo} onClick={goShop}>
-            <img src="/logo.png" alt="AMC 宏睿樂器" style={{height:'40px',objectFit:'contain',display:'block'}} />
+            <img src="/logo.png" alt="AMC 宏睿樂器" style={{height:'36px',width:'auto',display:'block'}} />
           </button>
 
           {/* Categories */}
